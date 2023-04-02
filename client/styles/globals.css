@@ -105,3 +105,50 @@ a {
     color-scheme: dark;
   }
 }
+
+body{
+  background-color: #0885ff33;
+}
+
+.box{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+  gap: 12px;
+  isolation: isolate;
+  
+  width: 411px;
+  height: 500px;
+  
+  background: #0D1D27;
+  border-radius: 16px;
+  
+  /* Inside auto layout */
+  
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+}
+
+.box2{
+  /* Auto layout */
+
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px 12px 10px;
+gap: 8px;
+
+width: 387px;
+height: 320px;
+
+background: #132A3A;
+border-radius: 12px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+z-index: 1;
+}

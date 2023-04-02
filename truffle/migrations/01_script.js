@@ -239,7 +239,7 @@ const contract = await deployer.deploy(HodlUpHub, "0xa5E0829CaCEd8fFDD4De3c43696
 const whaleUsdcBalance = await usdcToken.methods.balanceOf(whaleAddress).call()
 console.log("Whale USDC balance is: ", whaleUsdcBalance)
 
-const txReceiptUsdc = await usdcToken.methods.transfer(myAddress, 1000000000000)
+const txReceiptUsdc = await usdcToken.methods.transfer(myAddress, whaleUsdcBalance)
   .send({ from: whaleAddress })
 
 console.log("Hash of the transaction: " + txReceiptUsdc.transactionHash)
@@ -250,15 +250,24 @@ console.log("My USDC balance is: ", myUsdcBalance)
 const whaleSandBalance = await sandToken.methods.balanceOf(whaleAddress).call()
 console.log("Whale SAND balance is: ", whaleSandBalance)
 
-// const txReceiptSand = await sandToken.methods.transfer(myAddress, 1000000000000)
-// .send({ from: whaleAddress })
+const txReceiptSand = await sandToken.methods.transfer(myAddress, whaleSandBalance) 
+.send({ from: whaleAddress })
 
-// console.log("Hash of the transaction: " + txReceiptSand.transactionHash)
+console.log("Hash of the transaction: " + txReceiptSand.transactionHash)
 
 const mySandBalance = await sandToken.methods.balanceOf(myAddress).call()
 console.log("My SAND balance is: ", mySandBalance)
 
-const txApproveUsdc = await usdcToken.methods.approve(HodlUpHub.address, 1000000000000)
+const txApproveUsdc = await usdcToken.methods.approve(HodlUpHub.address, whaleUsdcBalance)
 .send({ from: myAddress })
+
+const txApproveSand = await sandToken.methods.approve(HodlUpHub.address, whaleSandBalance)
+.send({ from: myAddress })
+
+const mySandDecimals = await sandToken.methods.decimals().call()
+console.log("My SAND decimals is: ", mySandDecimals)
+
+const myUsdcDecimals = await usdcToken.methods.decimals().call()
+console.log("My USDC decimals is: ", myUsdcDecimals)
 
 } 
