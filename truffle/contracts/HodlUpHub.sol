@@ -1,18 +1,5 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.18;
-
-import '../node_modules/@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol';
-import '../node_modules/@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol';
-import '../node_modules/@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol';
-import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
-import "../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "../node_modules/@ganache/console.log/console.sol";
-using SafeERC20 for IERC20;
-
-contract HodlUpHub is Ownable {
-
 // wallet whale MATIC: 0xe7804c37c13166fF0b37F5aE0BB07A3aEbb6e245
 // token MATIC 0x0000000000000000000000000000000000001010
 // token SAND 0xBbba073C31bF03b8ACf7c28EF0738DeCF3695683
@@ -27,7 +14,30 @@ contract HodlUpHub is Ownable {
 // paraswap aggreg mais non dispo sur testnet
 //NFT ERC-1155
 
-    // Available statuses for a position
+pragma solidity ^0.8.18;
+
+import '../node_modules/@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol';
+import '../node_modules/@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol';
+import '../node_modules/@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol';
+import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
+import "../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "../node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "../node_modules/@ganache/console.log/console.sol";
+using SafeERC20 for IERC20;
+
+/**
+ * @title HodlUpHub contract
+ * @dev This contract is used for hodling tokens and executing automated periodic swaps.
+ */
+contract HodlUpHub is Ownable {
+
+    /**
+     * @dev Enum representing the available statuses for a position.
+     * Active: the position is currently being executed
+     * Pause: the position is temporarily paused
+     * Closed: the position has been fully executed and cannot be reopened
+     * Locked: the position is locked for DCA, meaning that the tokens have been swapped but not transferred to the user
+     */
     enum Status {
         Active,
         Pause,
@@ -42,7 +52,7 @@ contract HodlUpHub is Ownable {
 
     Pair[] public pairsAvailable;
     uint256[] public intervalsAvailable;
-    IUniswapV2Router02 uniswapRouter;
+    IUniswapV2Router02 public uniswapRouter;
 
     struct User {
         Position[] Positions;
@@ -73,14 +83,14 @@ contract HodlUpHub is Ownable {
     }
 
     mapping(address => User) users;
-    address [] userAddresses;
+    address [] public userAddresses;
 
     mapping(address => uint) feesBalances;
 
     // Represents fee percentage taken for deposit. 
     // to avoid rounding errors, we multiply it by 10000. 1% is represented by 100
-    uint depositFee;
-    uint swapFee;
+    uint public depositFee;
+    uint public swapFee;
 
     constructor(address _uniswapRouter, uint _depositFee, uint _swapFee) {
         uniswapRouter = IUniswapV2Router02(_uniswapRouter);
@@ -110,12 +120,22 @@ contract HodlUpHub is Ownable {
                         positions[k].stacking == true &&
                         block.timestamp > positions[k].lastPurchaseTimestamp + positions[k].interval
                     ) {
-                        positions[k].SwappedFromBalance = positions[k].SwappedFromBalance + positions[k].amountPerSwap;
-                        uint amountSwapped = ( ( (positions[k].amountPerSwap * 10000) / totalToSwap ) * totalSwapped) / 10000;
-                        positions[k].SwappedToBalance = positions[k].SwappedToBalance + amountSwapped;
-                        positions[k].status = Status.Active;
-                        emit DCAExecuted (userAddresses[j], k, address(positions[k].pair.token_from), address(positions[k].pair.token_to), positions[k].amountPerSwap, amountSwapped, block.timestamp);
-                    }
+                        if (positions[k].amountPerSwap > (positions[k].totalAmountToSwap - positions[k].SwappedFromBalance)){
+                            users[userAddresses[j]].Positions[k].status = Status.Pause;
+                            emit PositionStatusChanged (userAddresses[j], k, Status.Pause, block.timestamp);  
+                        }
+                        else{
+                            uint amountSwapped = ( ( (positions[k].amountPerSwap * 10000) / totalToSwap ) * totalSwapped) / 10000;
+                            if (positions[k].mode == DcaMode.Limited){
+                                users[userAddresses[j]].Positions[k].dcaIterations = positions[k].dcaIterations - 1 ;
+                            }
+                            users[userAddresses[j]].Positions[k].SwappedFromBalance = positions[k].SwappedFromBalance + positions[k].amountPerSwap;
+                            users[userAddresses[j]].Positions[k].SwappedToBalance = positions[k].SwappedToBalance + amountSwapped;
+                            users[userAddresses[j]].Positions[k].status = Status.Active;
+                            users[userAddresses[j]].Positions[k].lastPurchaseTimestamp = block.timestamp;
+                            emit DCAExecuted (userAddresses[j], k, address(positions[k].pair.token_from), address(positions[k].pair.token_to), positions[k].amountPerSwap, amountSwapped, block.timestamp);
+                        }
+                     }
                 }
             }
             //emit DCAExecuted (userAddresses[i], j, address(positions[j].pair.token_from), address(positions[j].pair.token_to), positions[j].amountPerSwap);
@@ -124,23 +144,31 @@ contract HodlUpHub is Ownable {
 
     // execute DCA for users that want to get back directly to their wallet
     function _executeIndividualDCA () internal {
+
         for (uint256 i = 0; i < userAddresses.length; i++) {
             Position[] memory positions = users[userAddresses[i]].Positions;
             for (uint256 j = 0; j < positions.length; j++) {
                 if (positions[j].status == Status.Active &&
                     positions[j].stacking == false &&
-                    block.timestamp > positions[j].lastPurchaseTimestamp + positions[j].interval
+                    block.timestamp > (positions[j].lastPurchaseTimestamp + positions[j].interval)
                 ) {
-                    positions[j].status = Status.Locked;
-                    uint amoutPerSwapAfterFees =  positions[j].amountPerSwap - (positions[j].amountPerSwap * swapFee / 10000);
-                    uint resultSwap = _swap( positions[j].pair, amoutPerSwapAfterFees, positions[j].recipient) ;
-                    if (positions[j].mode == DcaMode.Limited){
-                        positions[j].dcaIterations = positions[j].dcaIterations-- ;
+                    if (positions[j].amountPerSwap > (positions[j].totalAmountToSwap - positions[j].SwappedFromBalance)){
+                        users[userAddresses[i]].Positions[j].status = Status.Pause;
+                        emit PositionStatusChanged (userAddresses[i], j, Status.Pause, block.timestamp);  
                     }
-                    positions[j].SwappedToBalance = positions[j].SwappedToBalance + resultSwap;
-                    positions[j].SwappedFromBalance = positions[j].SwappedFromBalance + positions[j].amountPerSwap;
-                    positions[j].status = Status.Active;
-                    emit DCAExecuted (userAddresses[i], j, address(positions[j].pair.token_from), address(positions[j].pair.token_to), positions[j].amountPerSwap, resultSwap, block.timestamp);
+                    else{
+                        users[userAddresses[i]].Positions[j].status = Status.Locked;
+                        uint amoutPerSwapAfterFees =  positions[j].amountPerSwap - (positions[j].amountPerSwap * swapFee / 10000);
+                        uint resultSwap = _swap( positions[j].pair, amoutPerSwapAfterFees, positions[j].recipient) ;
+                        if (positions[j].mode == DcaMode.Limited){
+                            users[userAddresses[i]].Positions[j].dcaIterations = positions[j].dcaIterations - 1 ;
+                        }
+                        users[userAddresses[i]].Positions[j].SwappedToBalance = positions[j].SwappedToBalance + resultSwap;
+                        users[userAddresses[i]].Positions[j].SwappedFromBalance = positions[j].SwappedFromBalance + positions[j].amountPerSwap;
+                        users[userAddresses[i]].Positions[j].status = Status.Active;
+                        users[userAddresses[i]].Positions[j].lastPurchaseTimestamp = block.timestamp;
+                        emit DCAExecuted (userAddresses[i], j, address(positions[j].pair.token_from), address(positions[j].pair.token_to), positions[j].amountPerSwap, resultSwap, block.timestamp);
+                    }
                 }
             }
         }
@@ -164,7 +192,7 @@ contract HodlUpHub is Ownable {
         return false;
     }
 
-    function _getTotalToSwap(Pair memory _pair) internal view returns(uint256) {
+    function _getTotalToSwap(Pair memory _pair) internal returns(uint256) {
         uint totalToSwap;
         for (uint256 i = 0; i < userAddresses.length; i++) {
             Position[] memory positions = users[userAddresses[i]].Positions;
@@ -176,7 +204,7 @@ contract HodlUpHub is Ownable {
                     block.timestamp > positions[j].lastPurchaseTimestamp + positions[j].interval
                 ) {                 
                     totalToSwap +=  positions[j].amountPerSwap;
-                    positions[j].status = Status.Locked;
+                    users[userAddresses[i]].Positions[j].status = Status.Locked;
                 }
             }
         }
@@ -258,10 +286,22 @@ contract HodlUpHub is Ownable {
         return tokenAddresses;
     }
 
+    function _checkValidERC20(address tokenAddress) internal view returns (bool) {
+        try IERC20(tokenAddress).totalSupply() returns (uint256 _supply) {
+            if (_supply > 0 ){
+                return true;
+            }
+            return false;
+        } catch (bytes memory) {
+            return false;
+        }
+    }
+
+
     function addPair(address _token_from, address _token_to, bool _active) external onlyOwner {
         require(_token_from != _token_to, "Input and Output tokens must be different");
-        require(IERC20(_token_from).totalSupply() > 0, "Input Token is not available. No Supply");
-        require(IERC20(_token_to).totalSupply() > 0, "Output Token is not available. No Supply");
+        require(_checkValidERC20(_token_from), "Input Token is not available. No Supply");
+        require(_checkValidERC20(_token_to), "Output Token is not available. No Supply");
         require(!_pairExists(Pair(IERC20(_token_from), IERC20(_token_to), true)), "Pair already exists");
         pairsAvailable.push(Pair(IERC20(_token_from), IERC20(_token_to), _active)); 
         emit PairAdded(_token_from, _token_to, block.timestamp);
@@ -284,10 +324,8 @@ contract HodlUpHub is Ownable {
         uint totalToSwapAfterFees = _totalAmountToSwap - (_totalAmountToSwap * depositFee / 10000);
         uint amountPerSwap = _amountPerSwap > 0 ? _amountPerSwap : ((totalToSwapAfterFees * 10000) / _dcaIterations) / 10000;
 
-        require (amountPerSwap > 0, "amount per swap cannot be 0");
-
         SafeERC20.safeTransferFrom(_pair.token_from, msg.sender, address(this), _totalAmountToSwap);   
-                if (!_userExists(msg.sender)){
+        if (!_userExists(msg.sender)){
             userAddresses.push(msg.sender);
         }
         users[msg.sender].Positions.push(Position(_name, _pair, totalToSwapAfterFees, _interval, _dcaIterations, amountPerSwap, block.timestamp, block.timestamp, 0, 0, 0, Status.Active ,msg.sender, _stacking, _dcaIterations == 0 ? DcaMode.Unlimited : DcaMode.Limited ));
@@ -303,7 +341,6 @@ contract HodlUpHub is Ownable {
 
     function closePosition(uint _positionId) external {
         require(_positionId < users[msg.sender].Positions.length , "Position doesn't exist");
-        require(_positionId < users[msg.sender].Positions.length , "Position doesn't exist");
         Position memory positionToClose = users[msg.sender].Positions[_positionId];
         require(positionToClose.status != Status.Locked, "Position is Locked: non closable");
 
@@ -312,22 +349,34 @@ contract HodlUpHub is Ownable {
             emit TokenClaimed( address (positionToClose.pair.token_from), positionToClose.totalAmountToSwap - positionToClose.SwappedFromBalance, block.timestamp );
         }
         if ( (positionToClose.SwappedToBalance) > 0 ) {
-            SafeERC20.safeTransfer(positionToClose.pair.token_to, msg.sender, positionToClose.SwappedToBalance);
-            emit TokenClaimed( address (positionToClose.pair.token_to), positionToClose.SwappedToBalance, block.timestamp );
+            // swapped token could only be claimed for staking position. not stacking position swap directly to the user wallet.
+            if (positionToClose.stacking == true){
+                SafeERC20.safeTransfer(positionToClose.pair.token_to, msg.sender, positionToClose.SwappedToBalance);
+                emit TokenClaimed( address (positionToClose.pair.token_to), positionToClose.SwappedToBalance, block.timestamp );
+            }
         }
         users[msg.sender].Positions[_positionId].status = Status.Closed;
         emit PositionStatusChanged (msg.sender, _positionId, Status.Closed, block.timestamp);  
     }
 
-    function claimToken(uint _positionId) external {
-        require(_positionId < users[msg.sender].Positions.length , "Position doesn't exist");
-        users[msg.sender].Positions[_positionId].status = Status.Closed;
+    function claimRewardGovernanceToken(uint _positionId) external {
+        //require(_positionId < users[msg.sender].Positions.length , "Position doesn't exist");
+        //users[msg.sender].Positions[_positionId].status = Status.Closed;
     }
 
     function claimFees(uint _positionId) external {
         require(_positionId < users[msg.sender].Positions.length , "Position doesn't exist");
         users[msg.sender].Positions[_positionId].status = Status.Closed;
         //emit PositionStatusChanged (msg.sender, _positionId, Status.Closed);  
+    }
+
+    function getPosition(uint _positionId) external view returns (Position memory){
+        return users[msg.sender].Positions[_positionId];
+    }
+
+    function executeSwap() external onlyOwner{
+        _executeIndividualDCA();
+        _executeStakedDCA();
     }
 
     event PairAdded(address token_from, address token_to, uint date);
