@@ -4,7 +4,7 @@ import Footer from '../Footer/Footer';
 
 const Layout = ({ children }) => {
     return (
-        <Flex justifyContent="space-between" alignItems="center" direction="column" height="100vh">
+        <Flex bg="#132A3A" justifyContent="space-between" alignItems="center" direction="column" height="100vh">
             <Header />
             {children}
             <Footer />
