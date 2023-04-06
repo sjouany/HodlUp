@@ -22,7 +22,7 @@ import '../node_modules/@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol
 import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 import "../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "../node_modules/@ganache/console.log/console.sol";
+//import "../node_modules/@ganache/console.log/console.sol";
 using SafeERC20 for IERC20;
 
 /**
@@ -55,7 +55,7 @@ contract HodlUpHub is Ownable {
     IUniswapV2Router02 public uniswapRouter;
 
     struct User {
-        Position[] Positions;
+        Position[] positions;
     }
 
     struct Pair {
@@ -73,7 +73,6 @@ contract HodlUpHub is Ownable {
         uint amountPerSwap;
         uint lastPurchaseTimestamp;
         uint createdTimestamp;
-        uint averagePrice;
         uint SwappedFromBalance;
         uint SwappedToBalance;  
         Status status;
@@ -99,12 +98,7 @@ contract HodlUpHub is Ownable {
     }
 
     function _userExists(address _userAddress) internal view returns (bool) {
-        for (uint i = 0; i < userAddresses.length; i++) {
-            if (userAddresses[i] == _userAddress) {
-                return true;
-            }
-        }
-        return false;
+        return (users[_userAddress].positions.length > 0);
     }
 
     // execute DCA for users that has choosen to stack
@@ -114,25 +108,25 @@ contract HodlUpHub is Ownable {
             uint totalToSwapAfterFees = totalToSwap - (totalToSwap * swapFee / 10000);
             uint totalSwapped = _swap(pairsAvailable[i], totalToSwapAfterFees, address(this)) ;
             for (uint256 j = 0; j < userAddresses.length; j++) {
-                Position[] memory positions = users[userAddresses[j]].Positions;
+                Position[] memory positions = users[userAddresses[j]].positions;
                 for (uint256 k = 0; k < positions.length; k++) {
                     if (positions[k].status == Status.Locked &&
                         positions[k].stacking == true &&
                         block.timestamp > positions[k].lastPurchaseTimestamp + positions[k].interval
                     ) {
                         if (positions[k].amountPerSwap > (positions[k].totalAmountToSwap - positions[k].SwappedFromBalance)){
-                            users[userAddresses[j]].Positions[k].status = Status.Pause;
+                            users[userAddresses[j]].positions[k].status = Status.Pause;
                             emit PositionStatusChanged (userAddresses[j], k, Status.Pause, block.timestamp);  
                         }
                         else{
                             uint amountSwapped = ( ( (positions[k].amountPerSwap * 10000) / totalToSwap ) * totalSwapped) / 10000;
                             if (positions[k].mode == DcaMode.Limited){
-                                users[userAddresses[j]].Positions[k].dcaIterations = positions[k].dcaIterations - 1 ;
+                                users[userAddresses[j]].positions[k].dcaIterations = positions[k].dcaIterations - 1 ;
                             }
-                            users[userAddresses[j]].Positions[k].SwappedFromBalance = positions[k].SwappedFromBalance + positions[k].amountPerSwap;
-                            users[userAddresses[j]].Positions[k].SwappedToBalance = positions[k].SwappedToBalance + amountSwapped;
-                            users[userAddresses[j]].Positions[k].status = Status.Active;
-                            users[userAddresses[j]].Positions[k].lastPurchaseTimestamp = block.timestamp;
+                            users[userAddresses[j]].positions[k].SwappedFromBalance = positions[k].SwappedFromBalance + positions[k].amountPerSwap;
+                            users[userAddresses[j]].positions[k].SwappedToBalance = positions[k].SwappedToBalance + amountSwapped;
+                            users[userAddresses[j]].positions[k].status = Status.Active;
+                            users[userAddresses[j]].positions[k].lastPurchaseTimestamp = block.timestamp;
                             emit DCAExecuted (userAddresses[j], k, address(positions[k].pair.token_from), address(positions[k].pair.token_to), positions[k].amountPerSwap, amountSwapped, block.timestamp);
                         }
                      }
@@ -146,27 +140,27 @@ contract HodlUpHub is Ownable {
     function _executeIndividualDCA () internal {
 
         for (uint256 i = 0; i < userAddresses.length; i++) {
-            Position[] memory positions = users[userAddresses[i]].Positions;
+            Position[] memory positions = users[userAddresses[i]].positions;
             for (uint256 j = 0; j < positions.length; j++) {
                 if (positions[j].status == Status.Active &&
                     positions[j].stacking == false &&
                     block.timestamp > (positions[j].lastPurchaseTimestamp + positions[j].interval)
                 ) {
                     if (positions[j].amountPerSwap > (positions[j].totalAmountToSwap - positions[j].SwappedFromBalance)){
-                        users[userAddresses[i]].Positions[j].status = Status.Pause;
+                        users[userAddresses[i]].positions[j].status = Status.Pause;
                         emit PositionStatusChanged (userAddresses[i], j, Status.Pause, block.timestamp);  
                     }
                     else{
-                        users[userAddresses[i]].Positions[j].status = Status.Locked;
+                        users[userAddresses[i]].positions[j].status = Status.Locked;
                         uint amoutPerSwapAfterFees =  positions[j].amountPerSwap - (positions[j].amountPerSwap * swapFee / 10000);
                         uint resultSwap = _swap( positions[j].pair, amoutPerSwapAfterFees, positions[j].recipient) ;
                         if (positions[j].mode == DcaMode.Limited){
-                            users[userAddresses[i]].Positions[j].dcaIterations = positions[j].dcaIterations - 1 ;
+                            users[userAddresses[i]].positions[j].dcaIterations = positions[j].dcaIterations - 1 ;
                         }
-                        users[userAddresses[i]].Positions[j].SwappedToBalance = positions[j].SwappedToBalance + resultSwap;
-                        users[userAddresses[i]].Positions[j].SwappedFromBalance = positions[j].SwappedFromBalance + positions[j].amountPerSwap;
-                        users[userAddresses[i]].Positions[j].status = Status.Active;
-                        users[userAddresses[i]].Positions[j].lastPurchaseTimestamp = block.timestamp;
+                        users[userAddresses[i]].positions[j].SwappedToBalance = positions[j].SwappedToBalance + resultSwap;
+                        users[userAddresses[i]].positions[j].SwappedFromBalance = positions[j].SwappedFromBalance + positions[j].amountPerSwap;
+                        users[userAddresses[i]].positions[j].status = Status.Active;
+                        users[userAddresses[i]].positions[j].lastPurchaseTimestamp = block.timestamp;
                         emit DCAExecuted (userAddresses[i], j, address(positions[j].pair.token_from), address(positions[j].pair.token_to), positions[j].amountPerSwap, resultSwap, block.timestamp);
                     }
                 }
@@ -195,7 +189,7 @@ contract HodlUpHub is Ownable {
     function _getTotalToSwap(Pair memory _pair) internal returns(uint256) {
         uint totalToSwap;
         for (uint256 i = 0; i < userAddresses.length; i++) {
-            Position[] memory positions = users[userAddresses[i]].Positions;
+            Position[] memory positions = users[userAddresses[i]].positions;
             for (uint256 j = 0; j < positions.length; j++) {
                 if (positions[j].pair.token_from == _pair.token_from &&
                     positions[j].pair.token_to == _pair.token_to &&
@@ -204,7 +198,7 @@ contract HodlUpHub is Ownable {
                     block.timestamp > positions[j].lastPurchaseTimestamp + positions[j].interval
                 ) {                 
                     totalToSwap +=  positions[j].amountPerSwap;
-                    users[userAddresses[i]].Positions[j].status = Status.Locked;
+                    users[userAddresses[i]].positions[j].status = Status.Locked;
                 }
             }
         }
@@ -239,7 +233,7 @@ contract HodlUpHub is Ownable {
     }
 
     function _positionExists(address _user, Position memory _position) internal view returns (bool) {
-        Position[] memory positions = users[_user].Positions;
+        Position[] memory positions = users[_user].positions;
         for (uint256 i = 0; i < positions.length; i++) {
             if(keccak256(abi.encodePacked(_position.name)) == keccak256(abi.encodePacked(positions[i].name)) &&
                 _position.pair.token_from == positions[i].pair.token_from && _position.pair.token_to == positions[i].pair.token_to) {
@@ -250,7 +244,7 @@ contract HodlUpHub is Ownable {
     }
 
     function _positionExists(address _user, string memory _name, Pair memory _pair) internal view returns (bool) {
-        Position[] memory positions = users[_user].Positions;
+        Position[] memory positions = users[_user].positions;
         for (uint256 i = 0; i < positions.length; i++) {
             if(keccak256(abi.encodePacked(_name)) == keccak256(abi.encodePacked(positions[i].name)) &&
                 _pair.token_from == positions[i].pair.token_from && _pair.token_to == positions[i].pair.token_to) {
@@ -328,20 +322,20 @@ contract HodlUpHub is Ownable {
         if (!_userExists(msg.sender)){
             userAddresses.push(msg.sender);
         }
-        users[msg.sender].Positions.push(Position(_name, _pair, totalToSwapAfterFees, _interval, _dcaIterations, amountPerSwap, block.timestamp, block.timestamp, 0, 0, 0, Status.Active ,msg.sender, _stacking, _dcaIterations == 0 ? DcaMode.Unlimited : DcaMode.Limited ));
+        users[msg.sender].positions.push(Position(_name, _pair, totalToSwapAfterFees, _interval, _dcaIterations, amountPerSwap, block.timestamp, block.timestamp, 0, 0, Status.Active ,msg.sender, _stacking, _dcaIterations == 0 ? DcaMode.Unlimited : DcaMode.Limited ));
     
-        emit PositionCreated (msg.sender, users[msg.sender].Positions.length-1, block.timestamp);  
+        emit PositionCreated (msg.sender, users[msg.sender].positions.length-1, block.timestamp);  
     }
 
     function setPositionStatus(uint _positionId, Status _status) external {
-        require(_positionId < users[msg.sender].Positions.length , "Position doesn't exist");
-        users[msg.sender].Positions[_positionId].status=_status;
+        require(_positionId < users[msg.sender].positions.length , "Position doesn't exist");
+        users[msg.sender].positions[_positionId].status=_status;
         emit PositionStatusChanged (msg.sender, _positionId, _status, block.timestamp);  
     }
 
     function closePosition(uint _positionId) external {
-        require(_positionId < users[msg.sender].Positions.length , "Position doesn't exist");
-        Position memory positionToClose = users[msg.sender].Positions[_positionId];
+        require(_positionId < users[msg.sender].positions.length , "Position doesn't exist");
+        Position memory positionToClose = users[msg.sender].positions[_positionId];
         require(positionToClose.status != Status.Locked, "Position is Locked: non closable");
 
         if ( (positionToClose.totalAmountToSwap - positionToClose.SwappedFromBalance) > 0 ) {
@@ -355,23 +349,23 @@ contract HodlUpHub is Ownable {
                 emit TokenClaimed( address (positionToClose.pair.token_to), positionToClose.SwappedToBalance, block.timestamp );
             }
         }
-        users[msg.sender].Positions[_positionId].status = Status.Closed;
+        users[msg.sender].positions[_positionId].status = Status.Closed;
         emit PositionStatusChanged (msg.sender, _positionId, Status.Closed, block.timestamp);  
     }
 
     function claimRewardGovernanceToken(uint _positionId) external {
-        //require(_positionId < users[msg.sender].Positions.length , "Position doesn't exist");
-        //users[msg.sender].Positions[_positionId].status = Status.Closed;
+        //require(_positionId < users[msg.sender].positions.length , "Position doesn't exist");
+        //users[msg.sender].positions[_positionId].status = Status.Closed;
     }
 
     function claimFees(uint _positionId) external {
-        require(_positionId < users[msg.sender].Positions.length , "Position doesn't exist");
-        users[msg.sender].Positions[_positionId].status = Status.Closed;
+        require(_positionId < users[msg.sender].positions.length , "Position doesn't exist");
+        users[msg.sender].positions[_positionId].status = Status.Closed;
         //emit PositionStatusChanged (msg.sender, _positionId, Status.Closed);  
     }
 
     function getPosition(uint _positionId) external view returns (Position memory){
-        return users[msg.sender].Positions[_positionId];
+        return users[msg.sender].positions[_positionId];
     }
 
     function executeSwap() external onlyOwner{
