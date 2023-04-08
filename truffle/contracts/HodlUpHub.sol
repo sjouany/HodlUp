@@ -1,19 +1,5 @@
 // SPDX-License-Identifier: MIT
 
-// wallet whale MATIC: 0xe7804c37c13166fF0b37F5aE0BB07A3aEbb6e245
-// token MATIC 0x0000000000000000000000000000000000001010
-// token SAND 0xBbba073C31bF03b8ACf7c28EF0738DeCF3695683
-// token USDC 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174
-//   ganache --fork https://polygon-mumbai.g.alchemy.com/v2/kN9xDViXa7ZgWWDQgNzzz-I9aIvsxIw3 --seed "grass permit accident owner lock above hello stick divide cigar void language" -i --unlock 0xe7804c37c13166fF0b37F5aE0BB07A3aEbb6e245 --networkId 999
-// ganache -f https://polygon-mainnet.g.alchemy.com/v2/E_47dJ_8PBLE24COiPQ1hcE1ZIBVgcps -u 0xe7804c37c13166fF0b37F5aE0BB07A3aEbb6e245 --networkId 999
-// ganache -f https://polygon-mainnet.g.alchemy.com/v2/E_47dJ_8PBLE24COiPQ1hcE1ZIBVgcps -u 0xe7804c37c13166fF0b37F5aE0BB07A3aEbb6e245 --networkId 137 -m "grass permit accident owner lock above hello stick divide cigar void language"
-//approve sur l'adresse du token ERC20
-// voir chainlink pour le prix
-//approve sur l'adresse du token ERC20
-// voir chainlink pour le prix
-// paraswap aggreg mais non dispo sur testnet
-//NFT ERC-1155
-
 pragma solidity ^0.8.18;
 
 import '../node_modules/@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol';
@@ -21,7 +7,9 @@ import '../node_modules/@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.
 import '../node_modules/@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol';
 import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 import "../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "../node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "./interfaces/IHodlUpRewardsManager.sol";
 //import "../node_modules/@ganache/console.log/console.sol";
 using SafeERC20 for IERC20;
 
@@ -56,6 +44,7 @@ contract HodlUpHub is Ownable {
 
     struct User {
         Position[] positions;
+        Position[] closedPositions;
     }
 
     struct Pair {
@@ -91,8 +80,11 @@ contract HodlUpHub is Ownable {
     uint public depositFee;
     uint public swapFee;
 
-    constructor(address _uniswapRouter, uint _depositFee, uint _swapFee) {
+    IHodlUpRewardsManager public rewardsManager;
+
+    constructor(address _uniswapRouter, address _rewardManager, uint _depositFee, uint _swapFee) {
         uniswapRouter = IUniswapV2Router02(_uniswapRouter);
+        rewardsManager = IHodlUpRewardsManager(_rewardManager);
         depositFee = _depositFee;
         swapFee = _swapFee;
     }
@@ -217,8 +209,6 @@ contract HodlUpHub is Ownable {
             path[0] = address(_pair.token_from);
             path[1] = address(_pair.token_to);
 
-            //uint[] memory amounts = uniswapRouter.getAmountsOut(_pair.token_from, path);
-             // require(amounts[1] >= montant deduit de chainlink +/- 10%, "Uniswap returned insufficient output amount");
             if (_amount != 0){
                     uint[] memory outputAmounts = uniswapRouter.swapExactTokensForTokens(_amount, 0, path, _receiver, block.timestamp + 1800);
                     return outputAmounts[1];
@@ -291,6 +281,12 @@ contract HodlUpHub is Ownable {
         }
     }
 
+    function _achivePosition(address _user, uint _positionId) internal returns (bool) {
+        users[_user].closedPositions.push( users[_user].positions[_positionId]);
+        users[_user].positions[_positionId] =  users[_user].positions[users[_user].positions.length - 1];
+        users[_user].positions.pop();
+    }
+
 
     function addPair(address _token_from, address _token_to, bool _active) external onlyOwner {
         require(_token_from != _token_to, "Input and Output tokens must be different");
@@ -350,10 +346,11 @@ contract HodlUpHub is Ownable {
             }
         }
         users[msg.sender].positions[_positionId].status = Status.Closed;
+        _achivePosition(msg.sender, _positionId);
         emit PositionStatusChanged (msg.sender, _positionId, Status.Closed, block.timestamp);  
     }
 
-    function claimRewardGovernanceToken(uint _positionId) external {
+    function claimRewards(uint _positionId) external {
         //require(_positionId < users[msg.sender].positions.length , "Position doesn't exist");
         //users[msg.sender].positions[_positionId].status = Status.Closed;
     }

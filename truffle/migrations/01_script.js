@@ -244,13 +244,17 @@ module.exports = async(deployer, network, accounts) => {
     await deployer.deploy(Hodl);
 	let hodl = await Hodl.deployed();
     await deployer.deploy(HodlUpRewardsManager, hodl.address, 600);
-	let hodlUpRewardsManager = await HodlUpRewardsManager.deployed();    
-    console.log(await hodlUpRewardsManager.getPriceFromOracle("0xBbba073C31bF03b8ACf7c28EF0738DeCF3695683"), { from: accounts[0] });
-    await deployer.deploy(HodlUpHub, UNISWAP_ROUTER_ADDRESS, DEPOSIT_FEE, SWAP_FEE, { from: accounts[0] });
+	let hodlUpRewardsManager = await HodlUpRewardsManager.deployed(); 
+    // Chainlink Price feeds addresses POLYGON MAINNET
+    // SAND / USD => 0x3D49406EDd4D52Fb7FFd25485f32E073b529C924
+    // MATIC / USD => 0xAB594600376Ec9fD91F8e885dADF0CE036862dE0
+    // LINK / USD => 0xd9FFdb71EbE7496cC440152d43986Aae0AB76665
+    await deployer.deploy(HodlUpHub, UNISWAP_ROUTER_ADDRESS, hodlUpRewardsManager.address, DEPOSIT_FEE, SWAP_FEE, { from: accounts[0] });
+    await hodl.mint(hodlUpRewardsManager.address, 1000000000,  { from: accounts[0] });
     let hodlUpHub =  await HodlUpHub.deployed();
-    await hodlUpHub.addInterval(1, { from: accounts[0] });
-    await hodlUpHub.addPair(USDC_ADDRESS, SAND_ADDRESS, true, { from: accounts[0] });
-    await hodl.provide(hodlUpHub.address, 100,  { from: accounts[0] });
+    //await hodlUpHub.addInterval(1, { from: accounts[0] });
+    //await hodlUpHub.addPair(USDC_ADDRESS, SAND_ADDRESS, true, { from: accounts[0] });
+
 
 
     //(HodlUpHubInstance.addInterval(1, {from: user1})

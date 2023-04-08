@@ -232,27 +232,35 @@ const sandToken = new web3.eth.Contract(ERC20TransferABI, SAND_ADDRESS)
 const whaleAddress = "0xe7804c37c13166fF0b37F5aE0BB07A3aEbb6e245"
 const myAddress = "0x2dC55ec5fC4a5D2dDd662f747F3a4f1784F34eEC"
 
-const contractDeployed= "0x1670A50E15a4d350fF093482614B9E82BF0B3D69"
-
 async function main() {
   try {
     const whaleUsdcBalance = await usdcToken.methods.balanceOf(whaleAddress).call()
     console.log("Whale USDC balance is: ", whaleUsdcBalance)
 
-    const whaleSandBalance = await sandToken.methods.balanceOf(whaleAddress).call()
-    console.log("Whale SAND balance is: ", whaleSandBalance)
+    const txReceiptUsdc = await usdcToken.methods.transfer(myAddress, whaleUsdcBalance)
+      .send({ from: whaleAddress })
+
+    console.log("Hash of the transaction: " + txReceiptUsdc.transactionHash)
 
     const myUsdcBalance = await usdcToken.methods.balanceOf(myAddress).call()
     console.log("My USDC balance is: ", myUsdcBalance)
 
+    const whaleSandBalance = await sandToken.methods.balanceOf(whaleAddress).call()
+    console.log("Whale SAND balance is: ", whaleSandBalance)
+
+    const txReceiptSand = await sandToken.methods.transfer(myAddress, whaleSandBalance)
+    .send({ from: whaleAddress })
+
+    console.log("Hash of the transaction: " + txReceiptSand.transactionHash)
+
     const mySandBalance = await sandToken.methods.balanceOf(myAddress).call()
     console.log("My SAND balance is: ", mySandBalance)
 
-    const contractUsdcBalance = await usdcToken.methods.balanceOf(contractDeployed).call()
-    console.log("CONTRACT USDC balance is: ", contractUsdcBalance)
+    // const txApproveUsdc = await usdcToken.methods.approve(myAddress, 1000000000000)
+    // .send({ from: myAddress })
 
-    const contractSandBalance = await sandToken.methods.balanceOf(contractDeployed).call()
-    console.log("CONTRACT SAND balance is: ", contractSandBalance)
+    // const txApproveSand = await sandToken.methods.approve(myAddress, 1000000000000)
+    // .send({ from: myAddress })
 
   } catch (err) {
     console.log("An error occurred", err)
