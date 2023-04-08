@@ -47018,10 +47018,16 @@
       "links": {},
       "address": "0x3C4D5E6aD973365428C817d0816E40f7D5cA82D2",
       "transactionHash": "0xcd1d5c69129e52169ad6561274057f096ee0e4ff33d903f1c38eb6a3fba7687b"
+    },
+    "80001": {
+      "events": {},
+      "links": {},
+      "address": "0xC036f520bC3641dFa80d714789f0BbFC16Ef31B9",
+      "transactionHash": "0x28d08169a1cf6a9972cd004fae9710fb531ae432a76330c1b68a59d0533bbc07"
     }
   },
   "schemaVersion": "3.4.13",
-  "updatedAt": "2023-04-08T09:30:51.413Z",
+  "updatedAt": "2023-04-08T13:29:24.307Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "This contract is used for hodling tokens and executing automated periodic swaps.",

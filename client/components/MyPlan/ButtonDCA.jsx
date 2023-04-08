@@ -1,4 +1,17 @@
-import { Button, useToast } from "@chakra-ui/react";
+import { } from "@chakra-ui/react";
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  Button,
+  useToast,
+  FormControl, Input
+} from '@chakra-ui/react'
 import { useAccount, useProvider, useSigner } from 'wagmi'
 import { getNetwork } from '@wagmi/core'
 import { useState, useEffect } from 'react'
@@ -6,9 +19,10 @@ import { ethers } from 'ethers'
 import hodlUpHubfromContract from "../../src/contracts/HodlUpHub.json"
 import ERC20Contract from "../../src/contracts/ERC20.json"
 
+
 function ButtonDCA(props) {
   const [myContract, setMyContract] = useState(null);
-  const[myAddress, setMyAddress] = useState("0x");
+  const [myAddress, setMyAddress] = useState("0x");
   const { data: signer } = useSigner();
   const provider = useProvider();
   const [isLoading, setIsLoading] = useState(false);
@@ -16,7 +30,7 @@ function ButtonDCA(props) {
 
   const toast = useToast();
   const loadContract = async () => {
-    
+
     const { chain } = getNetwork();
     //const contractAddress = hodlUpHubfromContract.networks[137].address;
     const hodlUpContractAddress = hodlUpHubfromContract.networks[chain.id == 1337 ? 137 : chain.id].address;
@@ -33,8 +47,8 @@ function ButtonDCA(props) {
   }, [useProvider, signer, useAccount]);
 
 
-  const handleClick = async () => {
-   //props.handleClick();
+  const createPosition = async () => {
+    //props.handleClick();
     const amountValue = (document.getElementById("input-amount").value);
     const tokenTo = (document.getElementById("token-to").value);
     const tokenFrom = (document.getElementById("token-from").value);
@@ -66,7 +80,7 @@ function ButtonDCA(props) {
       const decimals = await tokenFromContractProvider.decimals();
       const totalAmountToSwap = amountValue * (10 ** decimals);
       const transactionApprove = await tokenFromContractSigner.approve(myContract.address, totalAmountToSwap);
-      const transaction = await myContract.createPosition("pouet", pair, totalAmountToSwap, 1,0, 20, stake);
+      const transaction = await myContract.createPosition(inputValue, pair, totalAmountToSwap, 1, 0, 20, stake);
       toast({
         title: "Position crée avec succès",
         status: "success",
@@ -87,19 +101,55 @@ function ButtonDCA(props) {
     }
   };
 
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [inputValue, setInputValue] = useState("");
+
+
+  const handleInputChange = (event) => {
+    setInputValue(event.target.value);
+  };
+
+  const handleSubmit = () => {
+    // Faire quelque chose avec la valeur de l'input
+    console.log(inputValue);
+    // Fermer le modal
+    onClose();
+    createPosition();
+  };
+
   return (
-    <Button
-      onClick={handleClick}
-      isLoading={isLoading}
-      backgroundColor="#28DA98"
-      color="black"
-      fontWeight="bold"
-      size="lg"
-      _hover={{ backgroundColor: "#22ba8a" }}
-    // isLoading
-    >
-      {props.label}
-    </Button>
+    <>
+      <Button
+        onClick={onOpen}
+        isLoading={isLoading}
+        backgroundColor="#28DA98"
+        color="black"
+        fontWeight="bold"
+        size="lg"
+        _hover={{ backgroundColor: "#22ba8a" }}
+      // isLoading
+      >
+        {props.label}
+      </Button>
+      <Modal closeOnOverlayClick={false} isOpen={isOpen} onClose={onClose} isCentered backgroundColor="#28DA98">
+        <ModalOverlay />
+        <ModalContent backgroundColor="#132A3A">
+          <ModalHeader color="#28DA98">Choose a name for your position</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+          <FormControl>
+              <Input color="white" type="text" value={inputValue} onChange={handleInputChange} />
+            </FormControl>
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={handleSubmit} backgroundColor="#28DA98" mr={3}>
+              Save
+            </Button>
+            <Button variant="ghost" backgroundColor="#28DA98" onClick={onClose}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
   );
 }
 
