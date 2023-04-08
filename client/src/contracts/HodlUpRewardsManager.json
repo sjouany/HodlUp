@@ -11550,7 +11550,7 @@
     "version": "0.8.18+commit.87f61d96.Emscripten.clang"
   },
   "networks": {
-    "137": {
+    "80001": {
       "events": {
         "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
           "anonymous": false,
@@ -11616,12 +11616,6 @@
           "type": "event"
         }
       },
-      "links": {},
-      "address": "0xc2D232Ae0D7e35e8B42805CFb258b056C65eB7b0",
-      "transactionHash": "0x7746f3a187f4b5fabdf554d2c69adc6cb4d298ffa3aaeae64a4a65a1d0409a1e"
-    },
-    "80001": {
-      "events": {},
       "links": {},
       "address": "0xdDB9a76181857519C7B9815Ed895DC56e03E8683",
       "transactionHash": "0x96e3a18d56ffc8586bb500439bd62b60a326d2995850567bebfacb68d4703589"
