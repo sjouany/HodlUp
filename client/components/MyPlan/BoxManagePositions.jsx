@@ -10,6 +10,7 @@ import { ethers } from 'ethers'
 import hodlUpHubfromContract from "../../src/contracts/HodlUpHub.json"
 import ERC20Contract from "../../src/contracts/ERC20.json"
 import wagmi from 'wagmi';
+const mappings=require("../../src/constant/constant.js");
 
 function BoxManagePositions(props) {
   const [myContract, setMyContract] = useState("");
@@ -38,7 +39,11 @@ function BoxManagePositions(props) {
     getCreatedPositions();
   }, [useProvider, signer, useAccount, provider]);
 
-
+  function getDate(bigNumber) {
+    const timestamp = parseInt(bigNumber);
+    if (timestamp > 0) return (new Date(timestamp  * 1000 ).toLocaleDateString());
+    return "";
+  };
 
 
   const getCreatedPositions = async () => {
@@ -53,7 +58,7 @@ function BoxManagePositions(props) {
       console.log("pas de filter");
       return;
     }
-    const events = await myContract.queryFilter(eventFilter, 41297612, 'latest');
+    const events = await myContract.queryFilter(eventFilter, 41321975, 'latest');
     if (!eventFilter) {
       console.log("pas d'event'");
       return;
@@ -92,12 +97,18 @@ function BoxManagePositions(props) {
         <Box overflowX="auto" width="100%" overflowY="hidden">
           <SimpleGrid columns={{ sm: 1, md: 2 }} spacing={4} h="430px" overflow="auto">
             {createdPositions.map((card) => (
-              <Card key={card.id} color="white" bg="#132A3A" h="300px" w="220px">
+              <Card key={card.id} color="white" bg="#132A3A" h="300px" w="220px" fontSize="14px">
                 <CardHeader h="4px">
                   <Heading size="sm" fontSize="14px">{card.name}</Heading>
                 </CardHeader>
                 <CardBody>
-                  <Text>Recurrence: {card.interval / 3600} days</Text>
+                  <Text>Total For DCA: {parseInt(card.totalAmountToSwap)}</Text>
+                  <Text>Recurrence: {parseInt(card.interval) / 3600} days</Text>
+                  <Text>Total Swap From: {parseInt(card.SwappedFromBalance)}</Text>
+                  <Text>Total Swap To: {parseInt(card.SwappedToBalance)}</Text>
+                  <Text>Amount/Swap: {parseInt(card.amountPerSwap)}</Text>
+                  <Text>Last Swap: {getDate(card.lastPurchaseTimestamp._hex)}</Text>
+                  <Text color={ card.status === 0 ? '#28DA98' : '#ffaf8c'}>Status: {mappings.mappingStatus[card.status]}</Text>
                 </CardBody>
                 <CardFooter justifyContent="center">
                   <Button backgroundColor="#28DA98" color="black" fontWeight="bold" size="sm">

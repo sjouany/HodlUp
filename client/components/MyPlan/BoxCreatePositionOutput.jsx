@@ -71,7 +71,7 @@ function BoxOutputCreatePosition(props) {
                 <RadioGroup name="interval" onChange={setValueInterval} value={valueInterval} color="white" colorScheme="green">
                   <Stack direction='row'>
                     <Radio value='604800'>Weekly</Radio>
-                    <Radio value='2629746'>Monthly</Radio>
+                    <Radio value='1'>Monthly</Radio> {/*for the demo value 2629746 is replaced by 1 */}
                   </Stack>
                 </RadioGroup>
               </VStack>

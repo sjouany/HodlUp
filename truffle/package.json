@@ -1,13 +1,22 @@
 {
+  "name": "hodlup-project",
+  "version": "1.0.0",
+  "description": "Truffle project HodlUp contract",
+  "scripts": {
+    "deploy_dev": "npx truffle migrate --reset --network polygon_fork --to 01",
+    "deploy_mumbai": "npx truffle migrate --reset --network mumbai --f 02"
+  },
   "dependencies": {
     "@chainlink/contracts": "^0.6.1",
     "@ganache/console.log": "0.3.0",
     "@openzeppelin/contracts": "^4.8.2",
-    "@openzeppelin/test-helpers": "^0.5.16",
     "@truffle/hdwallet-provider": "^2.1.9",
     "@uniswap/v2-core": "^1.0.1",
     "@uniswap/v2-periphery": "^1.1.0-beta.0",
     "dotenv": "^16.0.3",
     "eth-gas-reporter": "^0.2.25"
+  },
+  "devDependencies": {
+    "@openzeppelin/test-helpers": "^0.5.16"
   }
 }

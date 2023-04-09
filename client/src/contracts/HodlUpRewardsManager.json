@@ -11617,18 +11617,82 @@
         }
       },
       "links": {},
-      "address": "0xc2D232Ae0D7e35e8B42805CFb258b056C65eB7b0",
-      "transactionHash": "0xe45749eb17adba03f2c2af1b865a291f3b50c03726ae83028413b9fcb4e7251f"
+      "address": "0xca0D3Fb11310eaB7904787E292b930E64f28c6ea",
+      "transactionHash": "0x929a2453d591f261bdec9bf9d53591f014381ad24a267805064489cf328846f2"
     },
     "80001": {
-      "events": {},
+      "events": {
+        "0x89c66952b48f3e96bf1d8ba1b63189520fd988a6979b8b740bd5c5d8dc53e205": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "contractAdded",
+              "type": "address"
+            }
+          ],
+          "name": "ContractAdded",
+          "type": "event"
+        },
+        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event"
+        },
+        "0xd92c424393cb3ccdf7d5e36602e3bfa34f24490579ba47978f4bcfad496995f2": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "contract IERC20",
+              "name": "token",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "user",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "date",
+              "type": "uint256"
+            }
+          ],
+          "name": "RewardsClaimed",
+          "type": "event"
+        }
+      },
       "links": {},
-      "address": "0xdDB9a76181857519C7B9815Ed895DC56e03E8683",
-      "transactionHash": "0x96e3a18d56ffc8586bb500439bd62b60a326d2995850567bebfacb68d4703589"
+      "address": "0x423dDEAC2e6bEC83D08Bd6bE12D39ADb710fB624",
+      "transactionHash": "0xebb0918c06e7b5f4e6ab64f39cb580514d2dcece6b05355c781260befba4b806"
     }
   },
   "schemaVersion": "3.4.13",
-  "updatedAt": "2023-04-09T00:33:28.004Z",
+  "updatedAt": "2023-04-09T10:02:26.458Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "This contract manages the distribution of rewards in the form of an ERC20 token (HODL) to users who hold specific ERC20 tokens.",
