@@ -46667,76 +46667,6 @@
   "networks": {
     "80001": {
       "events": {
-        "0x88b7fdf581bd51ea599cc19a1013fde53651b93ffad3177861e345a9ab01fadd": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "interval",
-              "type": "uint256"
-            }
-          ],
-          "name": "IntervalAdded",
-          "type": "event"
-        },
-        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "previousOwner",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "newOwner",
-              "type": "address"
-            }
-          ],
-          "name": "OwnershipTransferred",
-          "type": "event"
-        },
-        "0xc26cc79589f7c5b1fb18650002371abf239e6083ab356e4179c11da5185611ec": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "token_from",
-              "type": "address"
-            },
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "token_to",
-              "type": "address"
-            }
-          ],
-          "name": "PairAdded",
-          "type": "event"
-        },
-        "0x77b029cdc31eeab36803cd47dc813d0ffb6332baea128b6cd6a2abb332879e15": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "sender",
-              "type": "address"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "id",
-              "type": "uint256"
-            }
-          ],
-          "name": "PositionCreated",
-          "type": "event"
-        },
         "0xd77c8e9038ce2394ee0528e954e75f9693506cd98cc37fc1d0415fd4c49ba23e": {
           "anonymous": false,
           "inputs": [
@@ -46803,6 +46733,25 @@
             }
           ],
           "name": "IntervalAdded",
+          "type": "event"
+        },
+        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
           "type": "event"
         },
         "0xedd4b700a2980a33a301ad39ced5dbc1c98a786ecb28da5bf3926d5165005d1b": {
@@ -46913,18 +46862,12 @@
         }
       },
       "links": {},
-      "address": "0x3C4D5E6aD973365428C817d0816E40f7D5cA82D2",
-      "transactionHash": "0xcd1d5c69129e52169ad6561274057f096ee0e4ff33d903f1c38eb6a3fba7687b"
-    },
-    "80001": {
-      "events": {},
-      "links": {},
-      "address": "0x50d644042BE023DcFBa1990577757C7d4c2BbAa6",
-      "transactionHash": "0xa20ac1290f9f512f4faecde79d4d9678c87194f80778073b0e325c6af64a4172"
+      "address": "0x31cD877888318c925A78048951Ed4aaD3a9d60A4",
+      "transactionHash": "0x9f53121aab1d37b3f3bded6147cb69e24d1f237ee07261ec98b1feae47993f5c"
     }
   },
   "schemaVersion": "3.4.13",
-  "updatedAt": "2023-04-09T10:02:26.397Z",
+  "updatedAt": "2023-04-09T10:24:40.840Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "This contract is used for hodling tokens and executing automated periodic swaps.",
