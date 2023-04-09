@@ -58,7 +58,7 @@ function BoxManagePositions(props) {
       console.log("pas de filter");
       return;
     }
-    const events = await myContract.queryFilter(eventFilter, 41321975, 'latest');
+    const events = await myContract.queryFilter(eventFilter, 41325915, 'latest');
     if (!eventFilter) {
       console.log("pas d'event'");
       return;
