@@ -11550,7 +11550,7 @@
     "version": "0.8.18+commit.87f61d96.Emscripten.clang"
   },
   "networks": {
-    "137": {
+    "80001": {
       "events": {
         "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
           "anonymous": false,
@@ -11617,75 +11617,11 @@
         }
       },
       "links": {},
-      "address": "0xca0D3Fb11310eaB7904787E292b930E64f28c6ea",
-      "transactionHash": "0x929a2453d591f261bdec9bf9d53591f014381ad24a267805064489cf328846f2"
+      "address": "0xc2D232Ae0D7e35e8B42805CFb258b056C65eB7b0",
+      "transactionHash": "0x7746f3a187f4b5fabdf554d2c69adc6cb4d298ffa3aaeae64a4a65a1d0409a1e"
     },
     "80001": {
-      "events": {
-        "0x89c66952b48f3e96bf1d8ba1b63189520fd988a6979b8b740bd5c5d8dc53e205": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "contractAdded",
-              "type": "address"
-            }
-          ],
-          "name": "ContractAdded",
-          "type": "event"
-        },
-        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "previousOwner",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "newOwner",
-              "type": "address"
-            }
-          ],
-          "name": "OwnershipTransferred",
-          "type": "event"
-        },
-        "0xd92c424393cb3ccdf7d5e36602e3bfa34f24490579ba47978f4bcfad496995f2": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "contract IERC20",
-              "name": "token",
-              "type": "address"
-            },
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "user",
-              "type": "address"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "amount",
-              "type": "uint256"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "date",
-              "type": "uint256"
-            }
-          ],
-          "name": "RewardsClaimed",
-          "type": "event"
-        }
-      },
+      "events": {},
       "links": {},
       "address": "0x423dDEAC2e6bEC83D08Bd6bE12D39ADb710fB624",
       "transactionHash": "0xebb0918c06e7b5f4e6ab64f39cb580514d2dcece6b05355c781260befba4b806"
