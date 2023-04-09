@@ -372,8 +372,8 @@ contract HodlUpHub is Ownable {
 
     event PairAdded(address token_from, address token_to, uint date);
     event IntervalAdded(uint256 interval, uint date);
-    event PositionCreated (address sender, uint256 id, uint date);
-    event PositionStatusChanged (address sender, uint256 id, Status status, uint date);
+    event PositionCreated (address indexed sender, uint256 id, uint date);
+    event PositionStatusChanged (address indexed sender, uint256 id, Status status, uint date);
     event DCAExecuted (address user, uint positionId, address token_from, address token_to, uint amountToSwap, uint amountSwapped, uint date);
     event TokenClaimed (address token, uint amount, uint date);
 

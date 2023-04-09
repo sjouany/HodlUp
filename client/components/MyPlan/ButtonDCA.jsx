@@ -27,7 +27,8 @@ function ButtonDCA(props) {
   const provider = useProvider();
   const [isLoading, setIsLoading] = useState(false);
   const { address, isConnecting, isDisconnected } = useAccount();
-
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [inputValue, setInputValue] = useState("");
   const toast = useToast();
   const loadContract = async () => {
 
@@ -53,7 +54,17 @@ function ButtonDCA(props) {
     const tokenTo = (document.getElementById("token-to").value);
     const tokenFrom = (document.getElementById("token-from").value);
     const stake = (document.getElementById("stake").checked);
-
+    const selectedIntervalRadio = document.querySelector('input[name="interval"]:checked');
+    const selectedIterationsRadio = document.querySelector('input[name="iterations"]:checked');
+    const interval = selectedIntervalRadio.value;
+    let iterations;
+    console.log("interval :",interval);
+    if (selectedIterationsRadio) {
+      iterations = selectedIterationsRadio.value;
+    } else {
+      iterations = 0;
+    }
+    console.log("Iterations:", iterations);
     console.log("Amount:", amountValue);
     console.log("TokenTo:", tokenTo);
     console.log("Stake:", stake);
@@ -80,7 +91,8 @@ function ButtonDCA(props) {
       const decimals = await tokenFromContractProvider.decimals();
       const totalAmountToSwap = amountValue * (10 ** decimals);
       const transactionApprove = await tokenFromContractSigner.approve(myContract.address, totalAmountToSwap);
-      const transaction = await myContract.createPosition(inputValue, pair, totalAmountToSwap, 1, 0, 20, stake);
+      const transaction = await myContract.createPosition(inputValue, pair, totalAmountToSwap, interval, 0, iterations, stake);
+
       toast({
         title: "Position crée avec succès",
         status: "success",
@@ -101,18 +113,11 @@ function ButtonDCA(props) {
     }
   };
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [inputValue, setInputValue] = useState("");
-
-
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
   };
 
   const handleSubmit = () => {
-    // Faire quelque chose avec la valeur de l'input
-    console.log(inputValue);
-    // Fermer le modal
     onClose();
     createPosition();
   };
@@ -127,7 +132,6 @@ function ButtonDCA(props) {
         fontWeight="bold"
         size="lg"
         _hover={{ backgroundColor: "#22ba8a" }}
-      // isLoading
       >
         {props.label}
       </Button>
