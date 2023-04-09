@@ -11552,6 +11552,19 @@
   "networks": {
     "80001": {
       "events": {
+        "0x89c66952b48f3e96bf1d8ba1b63189520fd988a6979b8b740bd5c5d8dc53e205": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "contractAdded",
+              "type": "address"
+            }
+          ],
+          "name": "ContractAdded",
+          "type": "event"
+        },
         "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
           "anonymous": false,
           "inputs": [
@@ -11569,19 +11582,6 @@
             }
           ],
           "name": "OwnershipTransferred",
-          "type": "event"
-        },
-        "0x89c66952b48f3e96bf1d8ba1b63189520fd988a6979b8b740bd5c5d8dc53e205": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "contractAdded",
-              "type": "address"
-            }
-          ],
-          "name": "ContractAdded",
           "type": "event"
         },
         "0xd92c424393cb3ccdf7d5e36602e3bfa34f24490579ba47978f4bcfad496995f2": {
@@ -11617,12 +11617,12 @@
         }
       },
       "links": {},
-      "address": "0xdDB9a76181857519C7B9815Ed895DC56e03E8683",
-      "transactionHash": "0x96e3a18d56ffc8586bb500439bd62b60a326d2995850567bebfacb68d4703589"
+      "address": "0x2952E500092C07d6FAC62f4f789cd59BA44C9993",
+      "transactionHash": "0xe462e78edc957441853516e6501dffcb6247fb75ed235eab2b9ebafdf6ff84d8"
     }
   },
   "schemaVersion": "3.4.13",
-  "updatedAt": "2023-04-08T13:29:24.345Z",
+  "updatedAt": "2023-04-09T10:24:40.869Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "This contract manages the distribution of rewards in the form of an ERC20 token (HODL) to users who hold specific ERC20 tokens.",

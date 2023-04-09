@@ -8702,6 +8702,25 @@
           "name": "Approval",
           "type": "event"
         },
+        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event"
+        },
         "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef": {
           "anonymous": false,
           "inputs": [
@@ -8726,34 +8745,15 @@
           ],
           "name": "Transfer",
           "type": "event"
-        },
-        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "previousOwner",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "newOwner",
-              "type": "address"
-            }
-          ],
-          "name": "OwnershipTransferred",
-          "type": "event"
         }
       },
       "links": {},
-      "address": "0x6D3A902215Bd7f2316Cc203628E6103309933d7B",
-      "transactionHash": "0x8f40953f632d7310b26f2c32d17854727384f6aef6ea1487baa1eb8a2eddb410"
+      "address": "0x40A6A3E407355bcd31664F760391Eb9Cae5bF3B1",
+      "transactionHash": "0x21baafde4030ef98fbdf3f7d85ac737d9bc4860badd41c6de6087d0f24b4ae15"
     }
   },
   "schemaVersion": "3.4.13",
-  "updatedAt": "2023-04-08T13:29:24.264Z",
+  "updatedAt": "2023-04-09T10:24:40.789Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "A token contract that mints new HODL tokens and allows the owner to transfer them to a specified recipient.",

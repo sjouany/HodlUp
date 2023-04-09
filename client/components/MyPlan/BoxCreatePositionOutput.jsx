@@ -29,7 +29,6 @@ function BoxOutputCreatePosition(props) {
 
   const handleIsStakedChange = (event) => {
     setIsStaked(event.target.checked);
-    console.log("wazzzzzzzzzzaaaaaaaaaaaaaaa");
   };
 
   // const handleTokenChangeFrom = (event) => {
@@ -69,10 +68,10 @@ function BoxOutputCreatePosition(props) {
                 <Text ml="2" color="white">
                   Orders Recurrence
                 </Text>
-                <RadioGroup onChange={setValueInterval} value={valueInterval} color="white" colorScheme="green">
+                <RadioGroup name="interval" onChange={setValueInterval} value={valueInterval} color="white" colorScheme="green">
                   <Stack direction='row'>
                     <Radio value='604800'>Weekly</Radio>
-                    <Radio value='2629746'>Monthly</Radio>
+                    <Radio value='1'>Monthly</Radio> {/*for the demo value 2629746 is replaced by 1 */}
                   </Stack>
                 </RadioGroup>
               </VStack>
@@ -80,7 +79,7 @@ function BoxOutputCreatePosition(props) {
                 <Text ml="2" color="white">
                   How many times
                 </Text>
-                <RadioGroup onChange={setValueIterations} value={valueIterations} color="white" colorScheme="green">
+                <RadioGroup name="iterations" onChange={setValueIterations} value={valueIterations} color="white" colorScheme="green">
                   <Stack direction='row'>
                     <Radio value='10'>10</Radio>
                     <Radio value='20'>20</Radio>

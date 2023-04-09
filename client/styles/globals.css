@@ -130,6 +130,26 @@ body{
   flex-grow: 0;
 }
 
+.box_management_position{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+  gap: 12px;
+  isolation: isolate;
+  
+  width: 550px;
+  height: 500px;
+  
+  background: #0D1D27;
+  border-radius: 16px;
+
+  
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+}
+
 .box_output_create_position{
 
 display: flex;
