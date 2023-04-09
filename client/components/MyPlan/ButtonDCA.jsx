@@ -89,7 +89,7 @@ function ButtonDCA(props) {
     setIsLoading(true); // Activer isLoading
     try {
       const decimals = await tokenFromContractProvider.decimals();
-      const totalAmountToSwap = Number(amountValue * (10 ** decimals));
+      const totalAmountToSwap = (amountValue * (10 ** decimals)).toString();
       const transactionApprove = await tokenFromContractSigner.approve(myContract.address, totalAmountToSwap);
       const transaction = await myContract.createPosition(inputValue, pair, totalAmountToSwap, interval, 0, iterations, stake);
 
