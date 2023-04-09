@@ -32,8 +32,8 @@ function BoxCreatePositionInput(props) {
   };
 
   const customOptionsFrom = [
-    { value: "0x2791bca1f2de4661ed88a30c99a7a9449aa84174", label: "USDC", icon: "USDC.png" },
-    { value: "0xc2132d05d31c914a87c6611c10748aeb04b58e8f", label: "USDT", icon: "USDT.png" },
+	{ value: "0xe11A86849d99F524cAC3E7A0Ec1241828e332C62", label: "USDC", icon: "USDC.png" },
+    { value: "0xA02f6adc7926efeBBd59Fd43A84f4E0c0c91e832", label: "USDT", icon: "USDT.png" },
   ];
 
 
