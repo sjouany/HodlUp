@@ -59,6 +59,11 @@ contract HodlUpRewardsManager is Ownable {
         rewardApy = _apy;
     }    
 
+    /**
+     * @dev Adds an oracle address to the oracles mapping
+     * @param _token The address of the ERC20 token corresponding to the oracle
+     * @param _oracle The address of the Chainlink oracle contract
+     */
     function addOracle(address _token, address _oracle) external onlyOwner {
         oracles[_token] = _oracle;
     }

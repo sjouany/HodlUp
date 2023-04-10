@@ -28,8 +28,11 @@ $ ganache -f https://polygon-mainnet.g.alchemy.com/v2/ALCHEMY_ID -u 0xe7804c37c1
 - from truffle launch **truffle test** (don't forget before to update informations inside truffle-config.js) 
 
 ```sh
-$ truffle test --network polygon_fork 
+$ truffle test --network polygon_fork --to 01
 ```
+
+- Test report 
+
 
 ## Local Deployment and execution
 
@@ -67,5 +70,66 @@ $ cd scripts/demo_local_fork; node launch_dca_exec
 ```sh
 $ truffle migrate --reset --network mumbai --f 02
 ```
-- After Mumbai deployment deploy the client part on Vercel or another Cloud provider
 
+```sh
+Compiling your contracts...
+===========================
+> Everything is up to date, there is nothing to compile.
+
+
+Starting migrations...
+======================
+> Network name:    'mumbai'
+> Network id:      80001
+> Block gas limit: 20196158 (0x1342b3e)
+
+
+02_deploy_mumbai.js
+===================
+
+   Replacing 'Hodl'
+   ----------------
+   > transaction hash:    0xb56d8cd88bcbea04fc07a0bd7720cd9eedb3c10efe9a8633515ec897ec793dcf
+   > Blocks: 2            Seconds: 4
+   > contract address:    0x457E049E1bA52A07F6d0540cCBb5EC3c912438a0
+   > block number:        34211772
+   > block timestamp:     1681154733
+   > account:             0x2dC55ec5fC4a5D2dDd662f747F3a4f1784F34eEC
+   > balance:             5.203944054085658372
+   > gas used:            801077 (0xc3935)
+   > gas price:           2.500000016 gwei
+   > value sent:          0 ETH
+   > total cost:          0.002002692512817232 ETH
+
+
+   Replacing 'HodlUpRewardsManager'
+   --------------------------------
+   > transaction hash:    0x8384fde62e07fd78ccec9864e1332f714b67eb4c00b1596a11fea450c34a0cec
+   > Blocks: 3            Seconds: 8
+   > contract address:    0x4849FaeC608A0E1008b7d230671747E6aa7eA238
+   > block number:        34211776
+   > block timestamp:     1681154743
+   > account:             0x2dC55ec5fC4a5D2dDd662f747F3a4f1784F34eEC
+   > balance:             5.201548466570326612
+   > gas used:            958235 (0xe9f1b)
+   > gas price:           2.500000016 gwei
+   > value sent:          0 ETH
+   > total cost:          0.00239558751533176 ETH
+
+
+   Replacing 'HodlUpHub'
+   ---------------------
+   > transaction hash:    0xd2666e1b1dd7b0fb67b648de230aa558701dde5b8b35c09d493dc1f05a9ed981
+   > Blocks: 2            Seconds: 4
+   > contract address:    0xd7583471402Fb9094c4bde70BF4A3ddc03A49a35
+   > block number:        34211780
+   > block timestamp:     1681154751
+   > account:             0x2dC55ec5fC4a5D2dDd662f747F3a4f1784F34eEC
+   > balance:             5.19076816150133266
+   > gas used:            4312122 (0x41cc3a)
+   > gas price:           2.500000016 gwei
+   > value sent:          0 ETH
+   > total cost:          0.010780305068993952 ETH
+```
+
+- After Mumbai deployment deploy the client part on Vercel or another Cloud provider
