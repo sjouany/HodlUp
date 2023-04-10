@@ -62,7 +62,6 @@ function BoxManagePositions(props) {
     for (const event of events) {
       try {
         const position = await myContract.getPosition(index, { from: address });
-        console.log(position);
         let stacking_status="Inactive";
         if (position.status == true){
           stacking_status="Active;"
@@ -171,7 +170,7 @@ function BoxManagePositions(props) {
         <Box overflowX="auto" width="100%" overflowY="hidden">
           <SimpleGrid columns={{ sm: 1, md: 2 }} spacing={4} h="430px" overflow="auto">
             {createdPositions.map((position) => (
-              <Card key={position.id} color="white" bg="#132A3A" h="380px" w="220px" fontSize="14px">
+              <Card key={position.id} color="white" bg="#132A3A" h="390px" w="220px" fontSize="14px">
                 <CardHeader h="4px">
                   <Heading size="sm" fontSize="14px">{(position.name).toString()}</Heading>
                 </CardHeader>
