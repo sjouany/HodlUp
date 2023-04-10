@@ -19,8 +19,8 @@ contract HodlUpRewardsManager is Ownable {
     ERC20 public rewardToken;
     uint public rewardApy;
     mapping(address => uint) balances;
-    mapping(address => address) oracles;
-    mapping(address => bool) authorizedContracts;
+    mapping(address => address) public oracles;
+    mapping(address => bool) public authorizedContracts;
 
     /**
      * @dev Constructor function
@@ -59,6 +59,10 @@ contract HodlUpRewardsManager is Ownable {
         rewardApy = _apy;
     }    
 
+    function addOracle(address _token, address _oracle) external onlyOwner {
+        oracles[_token] = _oracle;
+    }
+
     /**
      * @dev Get the USD price of an ERC20 token from its associated Chainlink oracle
      * @param _token The ERC20 token for which to get the USD price
@@ -88,9 +92,11 @@ contract HodlUpRewardsManager is Ownable {
     * @param _token The ERC20 token used to generate the rewards.
     * @param _amount The amount of tokens to generate rewards for.
     */
-    function generateRewards(address _user, ERC20 _token, uint _amount) external {
+    function generateRewards(address _user, ERC20 _token, uint _amount) external returns (uint256){
         require (authorizedContracts[msg.sender] == true, "Access not authorized" );
-        balances[_user] += _getDailyRewardWithAPY(_token, _amount);
+        uint256 rewards = _getDailyRewardWithAPY(_token, _amount);
+        balances[_user] += rewards;
+        return rewards;
     }
 
     /**
@@ -123,7 +129,7 @@ contract HodlUpRewardsManager is Ownable {
     * @param amount The amount of tokens claimed.
     * @param date The timestamp of the claim.
     */
-    event RewardsClaimed (IERC20 token, address user, uint amount, uint date);
+    event RewardsClaimed (ERC20 token, address user, uint amount, uint date);
     /**
     * @dev Emitted when a new contract is added to the system.
     * @param contractAdded The address of the contract that was added.

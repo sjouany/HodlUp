@@ -10,7 +10,7 @@ import "../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./interfaces/IHodlUpRewardsManager.sol";
-//import "../node_modules/@ganache/console.log/console.sol";
+import "../node_modules/@ganache/console.log/console.sol";
 using SafeERC20 for IERC20;
 
 /**
@@ -73,7 +73,7 @@ contract HodlUpHub is Ownable {
     mapping(address => User) users;
     address [] public userAddresses;
 
-    mapping(address => uint) feesBalances;
+    mapping(IERC20 => uint) feesBalances;
 
     // Represents fee percentage taken for deposit. 
     // to avoid rounding errors, we multiply it by 10000. 1% is represented by 100
@@ -95,13 +95,18 @@ contract HodlUpHub is Ownable {
 
     // execute DCA for users that has choosen to stack
     function _executeStakedDCA () internal {
+                                    console.log("!!!!!!????????????????????!!!!!!!!!!!!!!!!");
         for (uint i = 0; i < pairsAvailable.length; i++) {
             uint totalToSwap = _getTotalToSwap(pairsAvailable[i]);
-            uint totalToSwapAfterFees = totalToSwap - (totalToSwap * swapFee / 10000);
+            uint swapFees = (totalToSwap * swapFee / 10000);
+            uint totalToSwapAfterFees = totalToSwap - swapFees;
             uint totalSwapped = _swap(pairsAvailable[i], totalToSwapAfterFees, address(this)) ;
+            feesBalances[pairsAvailable[i].token_from]+=swapFees;
+                 console.log("!!!!SSSSSSSSSSSSSSSSSSSSSSSSSSSSS!!!");
             for (uint256 j = 0; j < userAddresses.length; j++) {
                 Position[] memory positions = users[userAddresses[j]].positions;
                 for (uint256 k = 0; k < positions.length; k++) {
+                    console.log("!!!????JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ!!!");
                     if (positions[k].status == Status.Locked &&
                         positions[k].stacking == true &&
                         block.timestamp > positions[k].lastPurchaseTimestamp + positions[k].interval
@@ -120,17 +125,18 @@ contract HodlUpHub is Ownable {
                             users[userAddresses[j]].positions[k].status = Status.Active;
                             users[userAddresses[j]].positions[k].lastPurchaseTimestamp = block.timestamp;
                             emit DCAExecuted (userAddresses[j], k, address(positions[k].pair.token_from), address(positions[k].pair.token_to), positions[k].amountPerSwap, amountSwapped, block.timestamp);
+                            console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                            _generateRewards(userAddresses[j], ERC20(address(positions[k].pair.token_to)), amountSwapped);
                         }
                      }
                 }
             }
-            //emit DCAExecuted (userAddresses[i], j, address(positions[j].pair.token_from), address(positions[j].pair.token_to), positions[j].amountPerSwap);
         }
     }
 
     // execute DCA for users that want to get back directly to their wallet
     function _executeIndividualDCA () internal {
-
+   console.log("!!QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ!!!");
         for (uint256 i = 0; i < userAddresses.length; i++) {
             Position[] memory positions = users[userAddresses[i]].positions;
             for (uint256 j = 0; j < positions.length; j++) {
@@ -144,13 +150,15 @@ contract HodlUpHub is Ownable {
                     }
                     else{
                         users[userAddresses[i]].positions[j].status = Status.Locked;
-                        uint amoutPerSwapAfterFees =  positions[j].amountPerSwap - (positions[j].amountPerSwap * swapFee / 10000);
+                        uint swapFees = (positions[j].amountPerSwap * swapFee / 10000);
+                        uint amoutPerSwapAfterFees =  positions[j].amountPerSwap - (swapFees);
                         uint resultSwap = _swap( positions[j].pair, amoutPerSwapAfterFees, positions[j].recipient) ;
+                        feesBalances[positions[j].pair.token_from]+=swapFees;
                         if (positions[j].mode == DcaMode.Limited){
-                            users[userAddresses[i]].positions[j].dcaIterations = positions[j].dcaIterations - 1 ;
+                            users[userAddresses[i]].positions[j].dcaIterations -= 1 ;
                         }
-                        users[userAddresses[i]].positions[j].SwappedToBalance = positions[j].SwappedToBalance + resultSwap;
-                        users[userAddresses[i]].positions[j].SwappedFromBalance = positions[j].SwappedFromBalance + positions[j].amountPerSwap;
+                        users[userAddresses[i]].positions[j].SwappedToBalance += resultSwap;
+                        users[userAddresses[i]].positions[j].SwappedFromBalance += positions[j].amountPerSwap;
                         users[userAddresses[i]].positions[j].status = Status.Active;
                         users[userAddresses[i]].positions[j].lastPurchaseTimestamp = block.timestamp;
                         emit DCAExecuted (userAddresses[i], j, address(positions[j].pair.token_from), address(positions[j].pair.token_to), positions[j].amountPerSwap, resultSwap, block.timestamp);
@@ -244,22 +252,22 @@ contract HodlUpHub is Ownable {
         return false;
     }
 
-    function _getAllInputTokenAddresses() external view returns (address[] memory) {
-        address[] memory tokenAddresses = new address[](pairsAvailable.length);
+    function _getAllInputToken() internal view returns (IERC20[] memory) {
+        IERC20[] memory tokenAddresses = new IERC20[](pairsAvailable.length);
         uint256 distinctTokenCount = 0;
         
         for (uint256 i = 0; i < pairsAvailable.length; i++) {
             // Check if the token_from address has already been added to the list
             bool exists = false;
             for (uint256 j = 0; j < distinctTokenCount; j++) {
-                if (tokenAddresses[j] == address(pairsAvailable[i].token_from)) {
+                if (tokenAddresses[j] == pairsAvailable[i].token_from) {
                     exists = true;
                     break;
                 }
             }
             // If token_from has not been added to the list yet, add it
             if (!exists) {
-                tokenAddresses[distinctTokenCount] = address(pairsAvailable[i].token_from);
+                tokenAddresses[distinctTokenCount] = pairsAvailable[i].token_from;
                 distinctTokenCount++;
             }
         }
@@ -281,7 +289,7 @@ contract HodlUpHub is Ownable {
         }
     }
 
-    function _achivePosition(address _user, uint _positionId) internal returns (bool) {
+    function _achivePosition(address _user, uint _positionId) internal {
         users[_user].closedPositions.push( users[_user].positions[_positionId]);
         users[_user].positions[_positionId] =  users[_user].positions[users[_user].positions.length - 1];
         users[_user].positions.pop();
@@ -355,10 +363,14 @@ contract HodlUpHub is Ownable {
         //users[msg.sender].positions[_positionId].status = Status.Closed;
     }
 
-    function claimFees(uint _positionId) external {
-        require(_positionId < users[msg.sender].positions.length , "Position doesn't exist");
-        users[msg.sender].positions[_positionId].status = Status.Closed;
-        //emit PositionStatusChanged (msg.sender, _positionId, Status.Closed);  
+    function claimFees() external onlyOwner{
+        IERC20[] memory tokens = _getAllInputToken();
+        for (uint256 i = 0; i < tokens.length; i++) {
+            uint256 balance = tokens[i].balanceOf(address(this));
+            if (balance > 0) {
+                SafeERC20.safeTransfer(tokens[i], msg.sender, feesBalances[tokens[i]]);
+            }
+        }
     }
 
     function getPosition(uint _positionId) external view returns (Position memory){
@@ -366,9 +378,20 @@ contract HodlUpHub is Ownable {
     }
 
     function executeSwap() external onlyOwner{
+           console.log("!!!!!!POUUUUUUUETTTTTTTTTT!!!!!!!!!!");
         _executeIndividualDCA();
         _executeStakedDCA();
     }
+
+    function _generateRewards(address _user, ERC20 _token, uint _amount) internal returns (uint256) {
+        console.log("??????????????????coicoicoicoicoicoi");
+       rewardsManager.generateRewards(_user, _token, _amount);
+    }
+
+    //     function generateRewards(address _user, ERC20 _token, uint _amount) external {
+    //     require (authorizedContracts[msg.sender] == true, "Access not authorized" );
+    //     balances[_user] += _getDailyRewardWithAPY(_token, _amount);
+    // }
 
     event PairAdded(address token_from, address token_to, uint date);
     event IntervalAdded(uint256 interval, uint date);

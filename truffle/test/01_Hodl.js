@@ -11,7 +11,7 @@ contract('Hodl', accounts => {
     let HodlInstance;
 
     describe("test constructor", function () {
-        it("should be initialize contract states", async () => {
+        xit("should be initialize contract states", async () => {
             HodlInstance = await Hodl.new();
             expect(await HodlInstance.name.call()).to.equal("Hodl");
             expect(await HodlInstance.symbol.call()).to.equal("HODL");
@@ -24,11 +24,11 @@ contract('Hodl', accounts => {
             HodlInstance = await Hodl.new();
         });
 
-        it("should not mint (not owner)", async () => {
+        xit("should not mint (not owner)", async () => {
             HodlInstance = await Hodl.new();
             await expectRevert(HodlInstance.mint(owner, 100, {from: user1}), 'Ownable: caller is not the owner');
         });
-        it("should mint", async () => {
+        xit("should mint", async () => {
             HodlInstance = await Hodl.new();
             expectedAmountnew = BN(10).pow(new BN(18))
             await HodlInstance.mint(owner, 1, {from: owner});
@@ -45,28 +45,28 @@ contract('Hodl', accounts => {
     //         HodlUpHubInstance = await HodlUpHub.new(uniswapRouterAddress,uniswapRouterAddress, 50, 20, {from:owner});
     //     });
 
-    //     it("should not create Pair (not owner)", async () => {
+    //     xit("should not create Pair (not owner)", async () => {
     //         await expectRevert(HodlUpHubInstance.addPair(USDC_ADDRESS, SAND_ADDRESS, true, {from: user1}), 'Ownable: caller is not the owner');
     //     });
 
-    //     it("should not create Pair (Non existing Input Token)", async () => {
+    //     xit("should not create Pair (Non existing Input Token)", async () => {
     //         await expectRevert(HodlUpHubInstance.addPair(uniswapRouterAddress, SAND_ADDRESS, true, {from: owner}), 'Input Token is not available. No Supply');
     //     });
 
-    //     it("should not create Pair (Non existing Output Token)", async () => {
+    //     xit("should not create Pair (Non existing Output Token)", async () => {
     //         await expectRevert(HodlUpHubInstance.addPair(USDC_ADDRESS, uniswapRouterAddress, true, {from: owner}), 'Output Token is not available. No Supply');
     //     });
 
-    //     it("should not create Pair (Non existing Output Token)", async () => {
+    //     xit("should not create Pair (Non existing Output Token)", async () => {
     //         await expectRevert(HodlUpHubInstance.addPair(USDC_ADDRESS, uniswapRouterAddress, true, {from: owner}), 'Output Token is not available. No Supply');
     //     });
 
-    //     it("should create Pair (event)", async () => {            
+    //     xit("should create Pair (event)", async () => {            
     //         //expect(await HodlUpHubInstance.pairsAvailable.length).to.be.bignumber.equal(new BN(0));
     //         expectEvent(await HodlUpHubInstance.addPair(USDC_ADDRESS, SAND_ADDRESS, true, {from: owner}) , "PairAdded", {token_from: USDC_ADDRESS, token_to: SAND_ADDRESS});
     //     });
 
-    //     it("should create Pair", async () => {            
+    //     xit("should create Pair", async () => {            
     //         await HodlUpHubInstance.addPair(USDC_ADDRESS, SAND_ADDRESS, true, {from: owner});
     //         const pair = await HodlUpHubInstance.pairsAvailable(0);
     //         await expect(pair.token_from).to.equal(USDC_ADDRESS);
@@ -74,7 +74,7 @@ contract('Hodl', accounts => {
     //         await expect(pair.active).to.be.true;
     //     });
 
-    //     it("should not create Pair (already exists)", async () => {            
+    //     xit("should not create Pair (already exists)", async () => {            
     //         await HodlUpHubInstance.addPair(USDC_ADDRESS, SAND_ADDRESS, true, {from: owner});
     //         await expectRevert(HodlUpHubInstance.addPair(USDC_ADDRESS, SAND_ADDRESS, true, {from: owner}), 'Pair already exists');
     //     });

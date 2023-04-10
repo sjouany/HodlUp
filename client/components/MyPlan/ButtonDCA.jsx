@@ -33,12 +33,9 @@ function ButtonDCA(props) {
   const loadContract = async () => {
 
     const { chain } = getNetwork();
-    //const contractAddress = hodlUpHubfromContract.networks[137].address;
     const hodlUpContractAddress = hodlUpHubfromContract.networks[chain.id == 1337 ? 137 : chain.id].address;
     const hodlUpContractABI = hodlUpHubfromContract.abi;
     const hodlUpContract = new ethers.Contract(hodlUpContractAddress, hodlUpContractABI, signer);
-    //console.log(signer);
-    // Stockez le contrat dans l'état du composant --chain.chainId=
     setMyContract(hodlUpContract);
     setMyAddress(address);
   };
@@ -49,7 +46,6 @@ function ButtonDCA(props) {
 
 
   const createPosition = async () => {
-    //props.handleClick();
     const amountValue = (document.getElementById("input-amount").value);
     const tokenTo = (document.getElementById("token-to").value);
     const tokenFrom = (document.getElementById("token-from").value);
@@ -58,7 +54,7 @@ function ButtonDCA(props) {
     const selectedIterationsRadio = document.querySelector('input[name="iterations"]:checked');
     const interval = selectedIntervalRadio.value;
     let iterations;
-    console.log("interval :",interval);
+
     if (selectedIterationsRadio) {
       iterations = selectedIterationsRadio.value;
     } else {
@@ -74,19 +70,19 @@ function ButtonDCA(props) {
     const tokenFromContractSigner = new ethers.Contract(tokenFrom, ERC20ABI, signer);
     const tokenFromContractProvider = new ethers.Contract(tokenFrom, ERC20ABI, provider);
 
-    // Instance de la structure Pair
+    // Instance of the Pair structure
     const pair = {
-      token_from: tokenFrom, // Adresse ERC20 du token from
-      token_to: tokenTo, // Adresse ERC20 du token to
+      token_from: tokenFrom, // ERC20 address of the token from
+      token_to: tokenTo,  // ERC20 address of the token to
       active: stake
     };
 
-    // Vérifiez si le contrat a été chargé avec succès
+    // check if contract is well loaded
     if (!myContract) {
-      console.error('Le contrat n\'a pas encore été chargé');
+      console.error('contract not yet loaded');
       return;
     }
-    setIsLoading(true); // Activer isLoading
+    setIsLoading(true); // activate isLoading
     try {
       const decimals = await tokenFromContractProvider.decimals();
       const totalAmountToSwap = (amountValue * (10 ** decimals)).toString();
@@ -94,14 +90,14 @@ function ButtonDCA(props) {
       const transaction = await myContract.createPosition(inputValue, pair, totalAmountToSwap, interval, 0, iterations, stake);
 
       toast({
-        title: "Position crée avec succès",
+        title: "Position creation successfull",
         status: "success",
         duration: 5000,
         isClosable: true,
       });
     } catch (error) {
       toast({
-        title: "Erreur lors de l'ajout d'une position",
+        title: "Error during Position creation",
         description: error.message,
         status: "error",
         duration: 5000,
@@ -109,7 +105,7 @@ function ButtonDCA(props) {
       });
       console.log(error);
     } finally {
-      setIsLoading(false); // Désactiver isLoading
+      setIsLoading(false); // deactivate isLoading
     }
   };
 
@@ -141,7 +137,7 @@ function ButtonDCA(props) {
           <ModalHeader color="#28DA98">Choose a name for your position</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-          <FormControl>
+            <FormControl>
               <Input color="white" type="text" value={inputValue} onChange={handleInputChange} />
             </FormControl>
           </ModalBody>

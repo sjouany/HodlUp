@@ -10,7 +10,7 @@ function BoxOutputCreatePosition(props) {
   const [selectedTokenTo, setSelectedTokenTo] = useState("");
   const [inputAmount, setInputAmount] = useState("");
   const [valueInterval, setValueInterval] = useState('604800');
-  const [valueIterations, setValueIterations] = useState('604800');
+  const [valueIterations, setValueIterations] = useState('10');
   const [isStaked, setIsStaked] = useState(false);
 
 

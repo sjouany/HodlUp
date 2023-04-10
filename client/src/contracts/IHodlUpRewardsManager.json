@@ -2,6 +2,113 @@
   "contractName": "IHodlUpRewardsManager",
   "abi": [
     {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_contract",
+          "type": "address"
+        }
+      ],
+      "name": "ContractAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "contract ERC20",
+          "name": "_token",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_user",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "_balance",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "RewardsClaimed",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_token",
+          "type": "address"
+        }
+      ],
+      "name": "setRewardToken",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_apy",
+          "type": "uint256"
+        }
+      ],
+      "name": "setApy",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_token",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_oracle",
+          "type": "address"
+        }
+      ],
+      "name": "addOracle",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_token",
+          "type": "address"
+        }
+      ],
+      "name": "getUSDPriceFromOracle",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "address",
@@ -22,7 +129,7 @@
           "type": "address"
         },
         {
-          "internalType": "contract IERC20",
+          "internalType": "contract ERC20",
           "name": "_token",
           "type": "address"
         },
@@ -33,7 +140,13 @@
         }
       ],
       "name": "generateRewards",
-      "outputs": [],
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
       "stateMutability": "nonpayable",
       "type": "function"
     },
@@ -58,7 +171,7 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.8.18+commit.87f61d96\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_contract\",\"type\":\"address\"}],\"name\":\"addContract\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"claimAllRewards\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"claimRewards\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_user\",\"type\":\"address\"},{\"internalType\":\"contract IERC20\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"generateRewards\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/interfaces/IHodlUpRewardsManager.sol\":\"IHodlUpRewardsManager\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/interfaces/IHodlUpRewardsManager.sol\":{\"keccak256\":\"0xde8e56a0193e4c9e0e77113bbf38ba76d5227e8a95edf69204a2d7924636d3a9\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://abe2e4bb7a74f93f25ee5517aad48b80e6be85e68f7e17efd8b03651d81e5fda\",\"dweb:/ipfs/QmVsb4hz8qAAJZiSQLv7XFSUpwvLtsSehQnJdQYUtHtrgw\"]},\"project:/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol\":{\"keccak256\":\"0x9750c6b834f7b43000631af5cc30001c5f547b3ceb3635488f140f60e897ea6b\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://5a7d5b1ef5d8d5889ad2ed89d8619c09383b80b72ab226e0fe7bde1636481e34\",\"dweb:/ipfs/QmebXWgtEfumQGBdVeM6c71McLixYXQP5Bk6kKXuoY4Bmr\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.18+commit.87f61d96\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"_contract\",\"type\":\"address\"}],\"name\":\"ContractAdded\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"contract ERC20\",\"name\":\"_token\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"_user\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"_balance\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_timestamp\",\"type\":\"uint256\"}],\"name\":\"RewardsClaimed\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_contract\",\"type\":\"address\"}],\"name\":\"addContract\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_oracle\",\"type\":\"address\"}],\"name\":\"addOracle\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"claimAllRewards\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"claimRewards\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_user\",\"type\":\"address\"},{\"internalType\":\"contract ERC20\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"generateRewards\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"}],\"name\":\"getUSDPriceFromOracle\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_apy\",\"type\":\"uint256\"}],\"name\":\"setApy\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"}],\"name\":\"setRewardToken\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/interfaces/IHodlUpRewardsManager.sol\":\"IHodlUpRewardsManager\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/interfaces/IHodlUpRewardsManager.sol\":{\"keccak256\":\"0x87feaab382645d8043c5cca514020b392375d5fbdae6bfc8a4f0dbc338d82e54\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://75cbff9b228020c5b4ba649525c5a03fa025bbfc4d128b95d64af07e1271eeab\",\"dweb:/ipfs/QmRWa8u2HpL9AJ7X7NUWcaqyFPkfHXHcKK3yUbgj4Dons8\"]},\"project:/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol\":{\"keccak256\":\"0x4ffc0547c02ad22925310c585c0f166f8759e2648a09e9b489100c42f15dd98d\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://15f52f51413a9de1ff191e2f6367c62178e1df7806d7880fe857a98b0b66253d\",\"dweb:/ipfs/QmaQG1fwfgUt5E9nu2cccFiV47B2V78MM1tCy1qB7n4MsH\"]},\"project:/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol\":{\"keccak256\":\"0x9750c6b834f7b43000631af5cc30001c5f547b3ceb3635488f140f60e897ea6b\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://5a7d5b1ef5d8d5889ad2ed89d8619c09383b80b72ab226e0fe7bde1636481e34\",\"dweb:/ipfs/QmebXWgtEfumQGBdVeM6c71McLixYXQP5Bk6kKXuoY4Bmr\"]},\"project:/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol\":{\"keccak256\":\"0x8de418a5503946cabe331f35fe242d3201a73f67f77aaeb7110acb1f30423aca\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://5a376d3dda2cb70536c0a45c208b29b34ac560c4cb4f513a42079f96ba47d2dd\",\"dweb:/ipfs/QmZQg6gn1sUpM8wHzwNvSnihumUCAhxD119MpXeKp8B9s8\"]},\"project:/node_modules/@openzeppelin/contracts/utils/Context.sol\":{\"keccak256\":\"0xe2e337e6dde9ef6b680e07338c493ebea1b5fd09b43424112868e9cc1706bca7\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://6df0ddf21ce9f58271bdfaa85cde98b200ef242a05a3f85c2bc10a8294800a92\",\"dweb:/ipfs/QmRK2Y5Yc6BK7tGKkgsgn3aJEQGi5aakeSPZvS65PV8Xp3\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "immutableReferences": {},
@@ -66,24 +179,33 @@
   "deployedGeneratedSources": [],
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.18;\nimport \"../../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol\";\n\ninterface IHodlUpRewardsManager {\n\n    function addContract(address _contract) external;\n\n    function generateRewards(address _user, IERC20 _token, uint _amount) external;\n\n    function claimRewards(uint _amount) external;\n\n    function claimAllRewards() external;\n\n}",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.18;\nimport \"../../node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol\";\n\ninterface IHodlUpRewardsManager {\n    \n    function setRewardToken(address _token) external;\n    \n    function setApy(uint _apy) external;\n    \n    function addOracle(address _token, address _oracle) external;\n    \n    function getUSDPriceFromOracle(address _token) external view returns (uint256);\n    \n    function addContract(address _contract) external;\n    \n    function generateRewards(address _user, ERC20 _token, uint _amount) external returns (uint256);\n    \n    function claimRewards(uint _amount) external;\n    \n    function claimAllRewards() external;\n    \n    event ContractAdded(address indexed _contract);\n    \n    event RewardsClaimed(ERC20 indexed _token, address indexed _user, uint256 indexed _balance, uint256 _timestamp);\n}\n",
   "sourcePath": "/home/sjouany/ProjetFinal/HodlUp/truffle/contracts/interfaces/IHodlUpRewardsManager.sol",
   "ast": {
     "absolutePath": "project:/contracts/interfaces/IHodlUpRewardsManager.sol",
     "exportedSymbols": {
+      "Context": [
+        12203
+      ],
+      "ERC20": [
+        11431
+      ],
       "IERC20": [
-        2191
+        11509
+      ],
+      "IERC20Metadata": [
+        11534
       ],
       "IHodlUpRewardsManager": [
-        2000
+        2514
       ]
     },
-    "id": 2001,
+    "id": 2515,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1975,
+        "id": 2448,
         "literals": [
           "solidity",
           "^",
@@ -91,17 +213,17 @@
           ".18"
         ],
         "nodeType": "PragmaDirective",
-        "src": "32:24:1"
+        "src": "32:24:2"
       },
       {
-        "absolutePath": "project:/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol",
-        "file": "../../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol",
-        "id": 1976,
+        "absolutePath": "project:/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "file": "../../node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "id": 2449,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 2001,
-        "sourceUnit": 2192,
-        "src": "57:75:1",
+        "scope": 2515,
+        "sourceUnit": 11432,
+        "src": "57:74:2",
         "symbolAliases": [],
         "unitAlias": ""
       },
@@ -112,36 +234,36 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 2000,
+        "id": 2514,
         "linearizedBaseContracts": [
-          2000
+          2514
         ],
         "name": "IHodlUpRewardsManager",
-        "nameLocation": "144:21:1",
+        "nameLocation": "143:21:2",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
-            "functionSelector": "5f539d69",
-            "id": 1981,
+            "functionSelector": "8aee8127",
+            "id": 2454,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
-            "name": "addContract",
-            "nameLocation": "182:11:1",
+            "name": "setRewardToken",
+            "nameLocation": "185:14:2",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1979,
+              "id": 2452,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1978,
+                  "id": 2451,
                   "mutability": "mutable",
-                  "name": "_contract",
-                  "nameLocation": "202:9:1",
+                  "name": "_token",
+                  "nameLocation": "208:6:2",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1981,
-                  "src": "194:17:1",
+                  "scope": 2454,
+                  "src": "200:14:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -149,10 +271,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1977,
+                    "id": 2450,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "194:7:1",
+                    "src": "200:7:2",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -162,42 +284,321 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "193:19:1"
+              "src": "199:16:2"
             },
             "returnParameters": {
-              "id": 1980,
+              "id": 2453,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "221:0:1"
+              "src": "224:0:2"
             },
-            "scope": 2000,
-            "src": "173:49:1",
+            "scope": 2514,
+            "src": "176:49:2",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "3b3f5e36",
+            "id": 2459,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setApy",
+            "nameLocation": "244:6:2",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2457,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2456,
+                  "mutability": "mutable",
+                  "name": "_apy",
+                  "nameLocation": "256:4:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2459,
+                  "src": "251:9:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2455,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "251:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "250:11:2"
+            },
+            "returnParameters": {
+              "id": 2458,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "270:0:2"
+            },
+            "scope": 2514,
+            "src": "235:36:2",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "f0ca4adb",
+            "id": 2466,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "addOracle",
+            "nameLocation": "290:9:2",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2464,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2461,
+                  "mutability": "mutable",
+                  "name": "_token",
+                  "nameLocation": "308:6:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2466,
+                  "src": "300:14:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2460,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "300:7:2",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2463,
+                  "mutability": "mutable",
+                  "name": "_oracle",
+                  "nameLocation": "324:7:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2466,
+                  "src": "316:15:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2462,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "316:7:2",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "299:33:2"
+            },
+            "returnParameters": {
+              "id": 2465,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "341:0:2"
+            },
+            "scope": 2514,
+            "src": "281:61:2",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "ff52775d",
+            "id": 2473,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getUSDPriceFromOracle",
+            "nameLocation": "361:21:2",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2469,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2468,
+                  "mutability": "mutable",
+                  "name": "_token",
+                  "nameLocation": "391:6:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2473,
+                  "src": "383:14:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2467,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "383:7:2",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "382:16:2"
+            },
+            "returnParameters": {
+              "id": 2472,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2471,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2473,
+                  "src": "422:7:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2470,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "422:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "421:9:2"
+            },
+            "scope": 2514,
+            "src": "352:79:2",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "5f539d69",
+            "id": 2478,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "addContract",
+            "nameLocation": "450:11:2",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2476,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2475,
+                  "mutability": "mutable",
+                  "name": "_contract",
+                  "nameLocation": "470:9:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2478,
+                  "src": "462:17:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2474,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "462:7:2",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "461:19:2"
+            },
+            "returnParameters": {
+              "id": 2477,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "489:0:2"
+            },
+            "scope": 2514,
+            "src": "441:49:2",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "78e36865",
-            "id": 1991,
+            "id": 2490,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "generateRewards",
-            "nameLocation": "237:15:1",
+            "nameLocation": "509:15:2",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1989,
+              "id": 2486,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1983,
+                  "id": 2480,
                   "mutability": "mutable",
                   "name": "_user",
-                  "nameLocation": "261:5:1",
+                  "nameLocation": "533:5:2",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1991,
-                  "src": "253:13:1",
+                  "scope": 2490,
+                  "src": "525:13:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -205,10 +606,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1982,
+                    "id": 2479,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "253:7:1",
+                    "src": "525:7:2",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -219,50 +620,50 @@
                 },
                 {
                   "constant": false,
-                  "id": 1986,
+                  "id": 2483,
                   "mutability": "mutable",
                   "name": "_token",
-                  "nameLocation": "275:6:1",
+                  "nameLocation": "546:6:2",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1991,
-                  "src": "268:13:1",
+                  "scope": 2490,
+                  "src": "540:12:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_IERC20_$2191",
-                    "typeString": "contract IERC20"
+                    "typeIdentifier": "t_contract$_ERC20_$11431",
+                    "typeString": "contract ERC20"
                   },
                   "typeName": {
-                    "id": 1985,
+                    "id": 2482,
                     "nodeType": "UserDefinedTypeName",
                     "pathNode": {
-                      "id": 1984,
-                      "name": "IERC20",
+                      "id": 2481,
+                      "name": "ERC20",
                       "nameLocations": [
-                        "268:6:1"
+                        "540:5:2"
                       ],
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 2191,
-                      "src": "268:6:1"
+                      "referencedDeclaration": 11431,
+                      "src": "540:5:2"
                     },
-                    "referencedDeclaration": 2191,
-                    "src": "268:6:1",
+                    "referencedDeclaration": 11431,
+                    "src": "540:5:2",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_IERC20_$2191",
-                      "typeString": "contract IERC20"
+                      "typeIdentifier": "t_contract$_ERC20_$11431",
+                      "typeString": "contract ERC20"
                     }
                   },
                   "visibility": "internal"
                 },
                 {
                   "constant": false,
-                  "id": 1988,
+                  "id": 2485,
                   "mutability": "mutable",
                   "name": "_amount",
-                  "nameLocation": "288:7:1",
+                  "nameLocation": "559:7:2",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1991,
-                  "src": "283:12:1",
+                  "scope": 2490,
+                  "src": "554:12:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -270,10 +671,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1987,
+                    "id": 2484,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "283:4:1",
+                    "src": "554:4:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -282,42 +683,70 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "252:44:1"
+              "src": "524:43:2"
             },
             "returnParameters": {
-              "id": 1990,
+              "id": 2489,
               "nodeType": "ParameterList",
-              "parameters": [],
-              "src": "305:0:1"
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2488,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2490,
+                  "src": "586:7:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2487,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "586:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "585:9:2"
             },
-            "scope": 2000,
-            "src": "228:78:1",
+            "scope": 2514,
+            "src": "500:95:2",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "0962ef79",
-            "id": 1996,
+            "id": 2495,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "claimRewards",
-            "nameLocation": "321:12:1",
+            "nameLocation": "614:12:2",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1994,
+              "id": 2493,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1993,
+                  "id": 2492,
                   "mutability": "mutable",
                   "name": "_amount",
-                  "nameLocation": "339:7:1",
+                  "nameLocation": "632:7:2",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1996,
-                  "src": "334:12:1",
+                  "scope": 2495,
+                  "src": "627:12:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -325,10 +754,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1992,
+                    "id": 2491,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "334:4:1",
+                    "src": "627:4:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -337,54 +766,238 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "333:14:1"
+              "src": "626:14:2"
             },
             "returnParameters": {
-              "id": 1995,
+              "id": 2494,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "356:0:1"
+              "src": "649:0:2"
             },
-            "scope": 2000,
-            "src": "312:45:1",
+            "scope": 2514,
+            "src": "605:45:2",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "0b83a727",
-            "id": 1999,
+            "id": 2498,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "claimAllRewards",
-            "nameLocation": "372:15:1",
+            "nameLocation": "669:15:2",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1997,
+              "id": 2496,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "387:2:1"
+              "src": "684:2:2"
             },
             "returnParameters": {
-              "id": 1998,
+              "id": 2497,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "398:0:1"
+              "src": "695:0:2"
             },
-            "scope": 2000,
-            "src": "363:36:1",
+            "scope": 2514,
+            "src": "660:36:2",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
+          },
+          {
+            "anonymous": false,
+            "eventSelector": "89c66952b48f3e96bf1d8ba1b63189520fd988a6979b8b740bd5c5d8dc53e205",
+            "id": 2502,
+            "name": "ContractAdded",
+            "nameLocation": "712:13:2",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 2501,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2500,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "_contract",
+                  "nameLocation": "742:9:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2502,
+                  "src": "726:25:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2499,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "726:7:2",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "725:27:2"
+            },
+            "src": "706:47:2"
+          },
+          {
+            "anonymous": false,
+            "eventSelector": "d92c424393cb3ccdf7d5e36602e3bfa34f24490579ba47978f4bcfad496995f2",
+            "id": 2513,
+            "name": "RewardsClaimed",
+            "nameLocation": "769:14:2",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 2512,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2505,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "_token",
+                  "nameLocation": "798:6:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2513,
+                  "src": "784:20:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_ERC20_$11431",
+                    "typeString": "contract ERC20"
+                  },
+                  "typeName": {
+                    "id": 2504,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 2503,
+                      "name": "ERC20",
+                      "nameLocations": [
+                        "784:5:2"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 11431,
+                      "src": "784:5:2"
+                    },
+                    "referencedDeclaration": 11431,
+                    "src": "784:5:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_ERC20_$11431",
+                      "typeString": "contract ERC20"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2507,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "_user",
+                  "nameLocation": "822:5:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2513,
+                  "src": "806:21:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2506,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "806:7:2",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2509,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "_balance",
+                  "nameLocation": "845:8:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2513,
+                  "src": "829:24:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2508,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "829:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2511,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_timestamp",
+                  "nameLocation": "863:10:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2513,
+                  "src": "855:18:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2510,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "855:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "783:91:2"
+            },
+            "src": "763:112:2"
           }
         ],
-        "scope": 2001,
-        "src": "134:268:1",
+        "scope": 2515,
+        "src": "133:744:2",
         "usedErrors": []
       }
     ],
-    "src": "32:370:1"
+    "src": "32:846:2"
   },
   "compiler": {
     "name": "solc",
@@ -392,7 +1005,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.13",
-  "updatedAt": "2023-04-06T19:31:11.704Z",
+  "updatedAt": "2023-04-10T11:21:57.371Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

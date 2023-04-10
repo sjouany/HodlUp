@@ -1,8 +1,8 @@
-
+require('dotenv').config();
 const Web3 = require("web3")
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 
-const provider = new HDWalletProvider("grass permit accident owner lock above hello stick divide cigar void language", "https://polygon-mumbai.g.alchemy.com/v2/kN9xDViXa7ZgWWDQgNzzz-I9aIvsxIw3}");
+const provider =  new HDWalletProvider(`${process.env.MNEMONIC}`, `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_ID}`);
 const web3 = new Web3(provider)
 
 const ERC20TransferABI = [
