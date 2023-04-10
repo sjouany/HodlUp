@@ -62,6 +62,11 @@ function BoxManagePositions(props) {
     for (const event of events) {
       try {
         const position = await myContract.getPosition(index, { from: address });
+        console.log(position);
+        let stacking_status="Inactive";
+        if (position.status == true){
+          stacking_status="Active;"
+        }
         const positionToInsert = {
           id: index,
           name: position.name,
@@ -72,7 +77,8 @@ function BoxManagePositions(props) {
           amountPerSwap: parseInt(position.amountPerSwap),
           lastPurchaseTimestamp: getDate(position.lastPurchaseTimestamp._hex),
           createdTimestamp: getDate(position.createdTimestamp._hex),
-          status: position.status
+          status: position.status,
+          stacking: stacking_status
         }
         positions.push(positionToInsert);
         index++; 
@@ -177,6 +183,7 @@ function BoxManagePositions(props) {
                   <Text>Amount/Swap: {position.amountPerSwap}</Text>
                   <Text>Last Swap: {position.lastPurchaseTimestamp}</Text>
                   <Text>Creation Date: {position.createdTimestamp}</Text>
+                  <Text>Stacking: {position.stacking}</Text>
                   <Text color={position.status === 0 ? '#28DA98' : '#ffaf8c'}>Status: {mappings.mappingStatus[position.status]}</Text>
                 </CardBody>
                 <CardFooter justifyContent="center">
