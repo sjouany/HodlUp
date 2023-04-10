@@ -260,8 +260,8 @@ async function main() {
     const mySandBalance = await sandToken.methods.balanceOf(myAddress).call()
     console.log("My SAND balance is: ", mySandBalance)
 
-    await contract.methods.addInterval("1")
-    .send({ from: myAddress, gas: '500000' })
+    // await contract.methods.addInterval("1")
+    // .send({ from: myAddress, gas: '500000' })
 
     await contract.methods.addInterval("604800")
     .send({ from: myAddress, gas: '500000' })
@@ -269,8 +269,8 @@ async function main() {
     await contract.methods.addInterval("2629746")
     .send({ from: myAddress, gas: '500000' })
     
-    await contract.methods.addPair('0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174', '0xBbba073C31bF03b8ACf7c28EF0738DeCF3695683', true)
-    .send({ from: myAddress, gas: '500000' })
+    // await contract.methods.addPair('0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174', '0xBbba073C31bF03b8ACf7c28EF0738DeCF3695683', true)
+    // .send({ from: myAddress, gas: '500000' })
 
     // const txApproveUsdc = await usdcToken.methods.approve(myAddress, 1000000000000)
     // .send({ from: myAddress })

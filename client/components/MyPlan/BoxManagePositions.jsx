@@ -1,6 +1,6 @@
 import {
   Box, Flex, Button, Text,
-  Card, CardHeader, CardBody, CardFooter, SimpleGrid, Heading
+  Card, CardHeader, CardBody, CardFooter, SimpleGrid, Heading, useToast
 } from '@chakra-ui/react';
 import { useAccount, useProvider, useSigner, useContractEvent } from 'wagmi'
 import { getNetwork } from '@wagmi/core'
@@ -19,6 +19,9 @@ function BoxManagePositions(props) {
   const provider = useProvider();
   const { address, isConnecting, isDisconnected } = useAccount();
   const [createdPositions, setCreatedPositions] = useState([]);
+  const [isLoadingClose, setIsLoadingClose] = useState(false);
+  const [isLoadingPause, setIsLoadingPause] = useState(false);
+  const toast = useToast();
 
   const loadContract = async () => {
 
@@ -44,24 +47,19 @@ function BoxManagePositions(props) {
 
   const getCreatedPositions = async () => {
     if (!myContract) {
-      console.log("pas de contrat");
       return;
     }
     const eventFilter = myContract.filters.PositionCreated(address, null, null);
     if (!eventFilter) {
-      console.log("pas de filter");
       return;
     }
-    const events = await myContract.queryFilter(eventFilter, 41365681, 'latest');
+    const events = await myContract.queryFilter(eventFilter, 41370855, 'latest');
     if (!eventFilter) {
-      console.log("pas d'event'");
       return;
     }
-    const positions = []; // tableau temporaire pour stocker les positions
+    const positions = []; 
     let index = 0;
     for (const event of events) {
-      console.log("COINCOIN");
-      console.log("index: ", index);
       try {
         const position = await myContract.getPosition(index, { from: address });
         const positionToInsert = {
@@ -76,10 +74,8 @@ function BoxManagePositions(props) {
           createdTimestamp: getDate(position.createdTimestamp._hex),
           status: position.status
         }
-
-        console.log("AAAAAAposition: ", positionToInsert);
         positions.push(positionToInsert);
-        index++; // Ajoute la position au tableau temporaire
+        index++; 
       }
       catch {
         console.log("proposition not found. it shouled be archived")
@@ -98,11 +94,54 @@ function BoxManagePositions(props) {
   })
 
   const setPositionStatus = async (id, status) => {
-    const transaction = await myContractToUpdate.setPositionStatus(id, status);
+    setIsLoadingPause(true);
+    try{
+      const transaction = await myContractToUpdate.setPositionStatus(id, status);
+      toast({
+        title: "Position status update successfull",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+    catch{
+      toast({
+        title: "Error during status update",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+    finally{
+      setIsLoadingPause(false);
+    }
   };
 
   const closePosition = async (id) => {
-    const transaction = await myContractToUpdate.closePosition(id);
+    setIsLoadingClose(true);
+    try{
+      const transaction = await myContractToUpdate.closePosition(id);
+      toast({
+        title: "Position closed successfully",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+    catch{
+      toast({
+        title: "Error during position closing",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      console.log(error);
+    }
+    finally{
+      setIsLoadingClose(false);
+    }
   };
 
   const handlePause = async (cardId, cardStatus) => {
@@ -119,7 +158,6 @@ function BoxManagePositions(props) {
     getCreatedPositions();
   };
 
-  //console.log(events);
   return (
 
     <Box className="box_management_position" p="5" borderWidth="1px" position="relative">
@@ -127,25 +165,25 @@ function BoxManagePositions(props) {
         <Box overflowX="auto" width="100%" overflowY="hidden">
           <SimpleGrid columns={{ sm: 1, md: 2 }} spacing={4} h="430px" overflow="auto">
             {createdPositions.map((position) => (
-              <Card key={position.id} color="white" bg="#132A3A" h="310px" w="220px" fontSize="14px">
+              <Card key={position.id} color="white" bg="#132A3A" h="380px" w="220px" fontSize="14px">
                 <CardHeader h="4px">
                   <Heading size="sm" fontSize="14px">{(position.name).toString()}</Heading>
                 </CardHeader>
                 <CardBody>
-                  <Text>Total For DCA: {parseInt(position.totalAmountToSwap)}</Text>
-                  <Text>Recurrence: {parseInt(position.interval) / 3600} days</Text>
-                  <Text>Total Swap From: {parseInt(position.SwappedFromBalance)}</Text>
-                  <Text>Total Swap To: {parseInt(position.SwappedToBalance)}</Text>
-                  <Text>Amount/Swap: {parseInt(position.amountPerSwap)}</Text>
-                  <Text>Last Swap: {getDate(position.lastPurchaseTimestamp._hex)}</Text>
-                  <Text>Creation Date: {getDate(position.createdTimestamp._hex)}</Text>
+                  <Text>Total For DCA: {position.totalAmountToSwap}</Text>
+                  <Text>Recurrence: {position.interval} days</Text>
+                  <Text>Total Swap From: {position.SwappedFromBalance}</Text>
+                  <Text>Total Swap To: {position.SwappedToBalance}</Text>
+                  <Text>Amount/Swap: {position.amountPerSwap}</Text>
+                  <Text>Last Swap: {position.lastPurchaseTimestamp}</Text>
+                  <Text>Creation Date: {position.createdTimestamp}</Text>
                   <Text color={position.status === 0 ? '#28DA98' : '#ffaf8c'}>Status: {mappings.mappingStatus[position.status]}</Text>
                 </CardBody>
                 <CardFooter justifyContent="center">
-                  <Button backgroundColor={position.status === 0 ? '#28DA98' : position.status === 1 ? '#ffaf8c' : '#28DA98'} color="black" fontWeight="bold" size="sm" onClick={() => handlePause(position.id, position.status)}>
+                  <Button isLoading={isLoadingPause} backgroundColor={position.status === 0 ? '#28DA98' : position.status === 1 ? '#ffaf8c' : '#28DA98'} color="black" fontWeight="bold" size="sm" onClick={() => handlePause(position.id, position.status)}>
                     {position.status === 0 ? 'Pause' : position.status === 1 ? 'Resume' : ''}
                   </Button>
-                  <Button marginLeft={2} backgroundColor="#ffaf8c" color="black" fontWeight="bold" size="sm" onClick={() => handleClose(position.id, position.status)}>
+                  <Button isLoading={isLoadingClose} marginLeft={2} backgroundColor="#ffaf8c" color="black" fontWeight="bold" size="sm" onClick={() => handleClose(position.id, position.status)}>
                     Close
                   </Button>
                 </CardFooter>

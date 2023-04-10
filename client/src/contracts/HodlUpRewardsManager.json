@@ -12332,7 +12332,7 @@
       },
       "links": {},
       "address": "0xc2D232Ae0D7e35e8B42805CFb258b056C65eB7b0",
-      "transactionHash": "0xea51cd821ffab3aeb852bdee9922334b218d8a5a42c1a09e5a84abbb2efe7dfa"
+      "transactionHash": "0x81686166c84b82c18abcfaf11a4b83d79efb30d8aa763e709b0e8a5822111b5c"
     },
     "80001": {
       "events": {
@@ -12406,7 +12406,7 @@
     }
   },
   "schemaVersion": "3.4.13",
-  "updatedAt": "2023-04-10T11:22:05.234Z",
+  "updatedAt": "2023-04-10T14:32:17.994Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "This contract manages the distribution of rewards in the form of an ERC20 token (HODL) to users who hold specific ERC20 tokens.",
