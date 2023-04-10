@@ -32,7 +32,113 @@ $ truffle test --network polygon_fork --to 01
 ```
 
 - Test report 
+```sh
+> Compiled successfully using:
+   - solc: 0.8.18+commit.87f61d96.Emscripten.clang
 
+  Contract: Hodl
+    test constructor
+      ✓ should be initialize contract states (1130ms, 801077 gas)
+    test mint
+      ✓ should not mint (not owner) (1211ms, 801077 gas)
+      ✓ should mint (1192ms, 871925 gas)
+
+  Contract: HodlUpHub
+    test constructor
+      ✓ should be initialize contract states (1203ms, 6071434 gas)
+    test Pair creation
+      ✓ should not create Pair (not owner) (24ms)
+      ✓ should not create Pair (must be different) (22ms)
+      ✓ should not create Pair (Non existing Input Token) (407ms)
+      ✓ should not create Pair (Non existing Output Token) (30ms)
+      ✓ should create Pair (event) (614ms, 109111 gas)
+      ✓ should create Pair (573ms, 109111 gas)
+      ✓ should not create Pair (already exists) (724ms, 109111 gas)
+    test Interval creation
+      ✓ should not create Interval (not owner) (30ms)
+      ✓ should create Interval (351ms, 69447 gas)
+      ✓ should create Interval (event) (421ms, 69447 gas)
+    test Position Creation
+      ✓ should not create Position (name empty) (41ms)
+      ✓ should not create Position (pair not available) (193ms)
+      ✓ should not create Position (interval not available) (181ms)
+      ✓ should not create Position (no amount for DCA) (169ms)
+      ✓ should not create Position (amount per swap and number of iterations) (185ms)
+      ✓ should create Position (without stacking and number iteration set) (3466ms, 389954 gas)
+      ✓ should create Position (without stacking and amount per swap set) (3746ms, 369847 gas)
+      ✓ should create Position (with stacking) (3763ms, 389966 gas)
+      ✓ should create Position (event) (4698ms, 389954 gas)
+      ✓ should not create Position (already exists) (4141ms, 389954 gas)
+      ✓ should create Position (test adding user into users Addresses array) (4274ms, 389954 gas)
+      ✓ should not set Position Status(Position doesn't exist) (3948ms, 389954 gas)
+    test DCA
+      ✓ should execute swap without stacking (10197ms, 664240 gas)
+      ✓ should execute swap without stacking (event) (6414ms, 647140 gas)
+      ✓ should execute swap without stacking and with no sufficient funds (9407ms, 962481 gas)
+      ✓ should execute swap with stacking (5047ms, 655737 gas)
+      ✓ should execute swap with stacking (event) (5964ms, 655737 gas)
+    Close Position
+      ✓ should not close position (does'nt exist) (43ms)
+      ✓ should not close position (position locked) (80ms, 31405 gas)
+
+  Contract: HodlUpRewardsManager
+    test constructor
+      ✓ should be initialize contract states (160ms, 1759312 gas)
+    test setter
+      ✓ should not set APY (Only Owner) (2ms)
+      ✓ should set APY (48ms, 28660 gas)
+      ✓ should not set Reward Token (Only Owner) (1ms)
+      ✓ should set Reward Token (46ms, 28984 gas)
+      ✓ should not add Oracle (Only Owner) (1ms)
+      ✓ should add Oracle (178ms, 46618 gas)
+      ✓ should not add Contract (2ms)
+      ✓ should add Contract (0ms)
+      ✓ should add Contract (event) (1ms)
+    test reward management
+      ✓ should get the USD price for SAND (1852ms)
+
+·----------------------------------------------|---------------------------|-------------|----------------------------·
+|     Solc version: 0.8.18+commit.87f61d96     ·  Optimizer enabled: true  ·  Runs: 200  ·  Block limit: 6718946 gas  │
+···············································|···························|·············|·····························
+|  Methods                                     ·               1 gwei/gas                ·       1.02 eur/matic       │
+·························|·····················|·············|·············|·············|··············|··············
+|  Contract              ·  Method             ·  Min        ·  Max        ·  Avg        ·  # calls     ·  eur (avg)  │
+·························|·····················|·············|·············|·············|··············|··············
+|  Hodl                  ·  approve            ·      28602  ·      58134  ·      44445  ·          43  ·       0.00  │
+·························|·····················|·············|·············|·············|··············|··············
+|  Hodl                  ·  mint               ·      70848  ·      70932  ·      70890  ·           2  ·       0.00  │
+·························|·····················|·············|·············|·············|··············|··············
+|  Hodl                  ·  transfer           ·      40804  ·      58776  ·      41750  ·          19  ·       0.00  │
+·························|·····················|·············|·············|·············|··············|··············
+|  HodlUpHub             ·  addInterval        ·          -  ·          -  ·      69447  ·          23  ·       0.00  │
+·························|·····················|·············|·············|·············|··············|··············
+|  HodlUpHub             ·  addPair            ·          -  ·          -  ·     109111  ·          28  ·       0.00  │
+·························|·····················|·············|·············|·············|··············|··············
+|  HodlUpHub             ·  createPosition     ·     369847  ·     389966  ·     387086  ·          21  ·       0.00  │
+·························|·····················|·············|·············|·············|··············|··············
+|  HodlUpHub             ·  executeSwap        ·     119832  ·     274286  ·     242386  ·          15  ·       0.00  │
+·························|·····················|·············|·············|·············|··············|··············
+|  HodlUpHub             ·  setPositionStatus  ·          -  ·          -  ·      31405  ·           1  ·       0.00  │
+·························|·····················|·············|·············|·············|··············|··············
+|  HodlUpRewardsManager  ·  addContract        ·          -  ·          -  ·      47206  ·           1  ·       0.00  │
+·························|·····················|·············|·············|·············|··············|··············
+|  HodlUpRewardsManager  ·  addOracle          ·          -  ·          -  ·      46618  ·           3  ·       0.00  │
+·························|·····················|·············|·············|·············|··············|··············
+|  HodlUpRewardsManager  ·  setApy             ·          -  ·          -  ·      28660  ·           2  ·       0.00  │
+·························|·····················|·············|·············|·············|··············|··············
+|  HodlUpRewardsManager  ·  setRewardToken     ·          -  ·          -  ·      28984  ·           2  ·       0.00  │
+·························|·····················|·············|·············|·············|··············|··············
+|  Deployments                                 ·                                         ·  % of limit  ·             │
+···············································|·············|·············|·············|··············|··············
+|  Hodl                                        ·          -  ·          -  ·     801077  ·      11.9 %  ·       0.00  │
+···············································|·············|·············|·············|··············|··············
+|  HodlUpHub                                   ·          -  ·          -  ·    4312122  ·      64.2 %  ·       0.00  │
+···············································|·············|·············|·············|··············|··············
+|  HodlUpRewardsManager                        ·          -  ·          -  ·     958235  ·      14.3 %  ·       0.00  │
+·----------------------------------------------|-------------|-------------|-------------|--------------|-------------·
+
+  44 passing (4m)
+```
 
 ## Local Deployment and execution
 
