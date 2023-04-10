@@ -5,12 +5,12 @@ import { useState, useEffect, cloneElement } from "react";
 
 
 function BoxOutputCreatePosition(props) {
-  //70%
+
   const [tokenFrom, setSelectedTokenFrom] = useState("");
   const [selectedTokenTo, setSelectedTokenTo] = useState("");
   const [inputAmount, setInputAmount] = useState("");
   const [valueInterval, setValueInterval] = useState('604800');
-  const [valueIterations, setValueIterations] = useState('604800');
+  const [valueIterations, setValueIterations] = useState('10');
   const [isStaked, setIsStaked] = useState(false);
 
 
@@ -22,18 +22,12 @@ function BoxOutputCreatePosition(props) {
 
   const handleSwap = () => {
     console.log("Swap button clicked!");
-    // setSelectedTokenFrom(selectedTokenFrom === "ETH" ? "USDT" : "ETH");
-    // setSelectedTokenTo(selectedTokenTo === "ETH" ? "USDT" : "ETH");
   };
 
 
   const handleIsStakedChange = (event) => {
     setIsStaked(event.target.checked);
   };
-
-  // const handleTokenChangeFrom = (event) => {
-  //   setSelectedTokenFrom(event.target.value);
-  // };
 
   const handleTokenChangeTo = (event) => {
     setSelectedTokenTo(event.target.value);
