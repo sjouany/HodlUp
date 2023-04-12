@@ -4,7 +4,7 @@ HodlUp is a Decentralized DCA web3 Dapp
 
 ## Links
 - You can see the video here : **https://youtu.be/WgnW4xoq28k**
-- Dapp deployed on Vercel : **https://vercel.com/sjouany/hodl-up**
+- Dapp deployed on Vercel : **https://hodl-up-sjouany.vercel.app/**
 
 
 ## Installation
