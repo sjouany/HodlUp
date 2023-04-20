@@ -8749,7 +8749,7 @@
       },
       "links": {},
       "address": "0x1670A50E15a4d350fF093482614B9E82BF0B3D69",
-      "transactionHash": "0x5b2cfc54289121c3b3d18254deae134a618bdd03359247cf6de37ddfc882060e"
+      "transactionHash": "0x04dd6cc4179760c38b5644ab3a0347cb9f0f7e097a8eb466837bfc0bacdab608"
     },
     "80001": {
       "events": {
@@ -8824,12 +8824,12 @@
         }
       },
       "links": {},
-      "address": "0x40A6A3E407355bcd31664F760391Eb9Cae5bF3B1",
-      "transactionHash": "0x21baafde4030ef98fbdf3f7d85ac737d9bc4860badd41c6de6087d0f24b4ae15"
+      "address": "0xdbd19e8990cB2e17eB6808A2954518C6A33C5e7A",
+      "transactionHash": "0xd69a9087f78c31e3273ee5a5659048abf6f8f18e173c5a68d3c511eb3a2c47e4"
     }
   },
   "schemaVersion": "3.4.13",
-  "updatedAt": "2023-04-10T14:32:17.957Z",
+  "updatedAt": "2023-04-12T09:13:20.623Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "A token contract that mints new HODL tokens and allows the owner to transfer them to a specified recipient.",

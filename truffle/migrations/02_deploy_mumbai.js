@@ -19,15 +19,21 @@ module.exports = async(deployer, network, accounts) => {
     // LINK / USD => 0xd9FFdb71EbE7496cC440152d43986Aae0AB76665
     await deployer.deploy(HodlUpHub, UNISWAP_ROUTER_ADDRESS, hodlUpRewardsManager.address, DEPOSIT_FEE, SWAP_FEE, { from: accounts[0] });
     await hodl.mint(hodlUpRewardsManager.address, 1000000000,  { from: accounts[0] });
+    console.log("mint");
     let hodlUpHub =  await HodlUpHub.deployed();
     // 1s Interval to show swap during demo
+    console.log("interval 1");
     await hodlUpHub.addInterval(1, { from: accounts[0] });
     // Week
+    console.log("interval 604800");
     await hodlUpHub.addInterval(604800, { from: accounts[0] });
     // Month
+    console.log("interval 2629746");
     await hodlUpHub.addInterval(2629746, { from: accounts[0] });
     // USDC / SAND
+    console.log("PAIR USDC/SAND");
     await hodlUpHub.addPair(USDC_ADDRESS, SAND_ADDRESS, true, { from: accounts[0] });
     // USDC / MATIC
+    console.log("PAIR USDC/MATIC");
     await hodlUpHub.addPair(USDC_ADDRESS, MATIC_ADDRESS, true, { from: accounts[0] });
 } 
