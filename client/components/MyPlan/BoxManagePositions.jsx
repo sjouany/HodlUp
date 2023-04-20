@@ -53,7 +53,7 @@ function BoxManagePositions(props) {
     if (!eventFilter) {
       return;
     }
-    const events = await myContract.queryFilter(eventFilter, 41370855, 'latest');
+    const events = await myContract.queryFilter(eventFilter, 41439932, 'latest');
     if (!eventFilter) {
       return;
     }
@@ -63,8 +63,8 @@ function BoxManagePositions(props) {
       try {
         const position = await myContract.getPosition(index, { from: address });
         let stacking_status="Inactive";
-        if (position.status == true){
-          stacking_status="Active;"
+        if (position.stacking == true){
+          stacking_status="Active"
         }
         const positionToInsert = {
           id: index,

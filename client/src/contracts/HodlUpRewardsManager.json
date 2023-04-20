@@ -97,7 +97,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -116,7 +117,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -129,7 +131,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -149,7 +152,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -162,7 +166,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -238,7 +243,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -12332,7 +12338,7 @@
       },
       "links": {},
       "address": "0xc2D232Ae0D7e35e8B42805CFb258b056C65eB7b0",
-      "transactionHash": "0x81686166c84b82c18abcfaf11a4b83d79efb30d8aa763e709b0e8a5822111b5c"
+      "transactionHash": "0x6f9a7ee70bf6ec7a00aa025ca44bc52ddc08c16e3ae74bb37ddf8c032b48c289"
     },
     "80001": {
       "events": {
@@ -12373,7 +12379,7 @@
           "inputs": [
             {
               "indexed": false,
-              "internalType": "contract IERC20",
+              "internalType": "contract ERC20",
               "name": "token",
               "type": "address"
             },
@@ -12401,12 +12407,13 @@
         }
       },
       "links": {},
-      "address": "0x2952E500092C07d6FAC62f4f789cd59BA44C9993",
-      "transactionHash": "0xe462e78edc957441853516e6501dffcb6247fb75ed235eab2b9ebafdf6ff84d8"
+      "address": "0xE49C1d0980b493c861B8D4C0b376100fC6fa980C",
+      "transactionHash": "0x905a87accb33aa01fd3b65c1e6b26f17b73cabd345c22686f79ed4f1e0a33713"
     }
   },
   "schemaVersion": "3.4.13",
-  "updatedAt": "2023-04-10T18:04:39.988Z",
+  "updatedAt": "2023-04-12T09:13:20.695Z",
+  "networkType": "ethereum",
   "devdoc": {
     "details": "This contract manages the distribution of rewards in the form of an ERC20 token (HODL) to users who hold specific ERC20 tokens.",
     "events": {
