@@ -10,7 +10,7 @@ const myAddress = "0x2dC55ec5fC4a5D2dDd662f747F3a4f1784F34eEC"
 
 async function main() {
   try {
-    await contract.methods.executeSwap().send({ from: myAddress, gas: '500000' })  
+    await contract.methods.executeSwap().send({ from: myAddress, gas: '800000' })  
   } catch (err) {
     console.log("An error occurred", err)
   }

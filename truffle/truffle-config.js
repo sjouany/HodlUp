@@ -17,9 +17,9 @@ module.exports = {
   contracts_build_directory: "../client/src/contracts",
   networks: {
     development: {
-     host: "127.0.0.1",     // Localhost (default: none)
-     port: 8545,            // Standard Ethereum port (default: none)
-     network_id: "*",       // Any network (default: none)
+      host: "127.0.0.1",     // Localhost (default: none)
+      port: 8545,            // Standard Ethereum port (default: none)
+      network_id: "*",       // Any network (default: none)
     },
     mumbai: {
       provider: () => new HDWalletProvider(`${process.env.MNEMONIC}`, `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_ID}`),
@@ -57,9 +57,9 @@ module.exports = {
   // Set default mocha options here, use special reporters, etc.
   mocha: {
     reporter: 'eth-gas-reporter',
-    reporterOptions : { 
-      gasPrice:1,
-      token:'MATIC',
+    reporterOptions: {
+      gasPrice: 1,
+      token: 'MATIC',
       gasPriceApi: 'https://api.polygonscan.com/api?module=proxy&action=eth_gasPrice',
       showTimeSpent: true,
       coinmarketcap: '59febe46-dfd3-4a6c-89f3-20be972b9775',
@@ -72,11 +72,11 @@ module.exports = {
       version: "0.8.18",      // Fetch exact version from solc-bin (default: truffle's version)
       // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
       settings: {          // See the solidity docs for advice about optimization and evmVersion
-       optimizer: {
-         enabled: true,
-         runs: 200
-       },
-      //  evmVersion: "byzantium"
+        optimizer: {
+          enabled: true,
+          runs: 200
+        },
+        //  evmVersion: "byzantium"
       }
     }
   },

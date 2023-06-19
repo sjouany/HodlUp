@@ -53,18 +53,19 @@ function BoxManagePositions(props) {
     if (!eventFilter) {
       return;
     }
-    const events = await myContract.queryFilter(eventFilter, 41439932, 'latest');
+
+    const events = await myContract.queryFilter(eventFilter, 42688736, 'latest');
     if (!eventFilter) {
       return;
     }
-    const positions = []; 
+    const positions = [];
     let index = 0;
     for (const event of events) {
       try {
         const position = await myContract.getPosition(index, { from: address });
-        let stacking_status="Inactive";
-        if (position.stacking == true){
-          stacking_status="Active"
+        let stacking_status = "Inactive";
+        if (position.stacking == true) {
+          stacking_status = "Active"
         }
         const positionToInsert = {
           id: index,
@@ -80,7 +81,7 @@ function BoxManagePositions(props) {
           stacking: stacking_status
         }
         positions.push(positionToInsert);
-        index++; 
+        index++;
       }
       catch {
         console.log("proposition not found. it shouled be archived")
@@ -100,7 +101,7 @@ function BoxManagePositions(props) {
 
   const setPositionStatus = async (id, status) => {
     setIsLoadingPause(true);
-    try{
+    try {
       const transaction = await myContractToUpdate.setPositionStatus(id, status);
       toast({
         title: "Position status update successfull",
@@ -109,7 +110,7 @@ function BoxManagePositions(props) {
         isClosable: true,
       });
     }
-    catch{
+    catch {
       toast({
         title: "Error during status update",
         description: error.message,
@@ -118,14 +119,14 @@ function BoxManagePositions(props) {
         isClosable: true,
       });
     }
-    finally{
+    finally {
       setIsLoadingPause(false);
     }
   };
 
   const closePosition = async (id) => {
     setIsLoadingClose(true);
-    try{
+    try {
       const transaction = await myContractToUpdate.closePosition(id);
       toast({
         title: "Position closed successfully",
@@ -134,7 +135,7 @@ function BoxManagePositions(props) {
         isClosable: true,
       });
     }
-    catch{
+    catch {
       toast({
         title: "Error during position closing",
         description: error.message,
@@ -144,7 +145,7 @@ function BoxManagePositions(props) {
       });
       console.log(error);
     }
-    finally{
+    finally {
       setIsLoadingClose(false);
     }
   };
