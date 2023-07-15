@@ -183,7 +183,8 @@ contract DcaHodlup is Ownable {
      * @return True if the user exists, false otherwise.
      */
     function _userExists(address _userAddress) internal view returns (bool) {
-        return (accounts[_userAddress].positionsKeys.length > 0 || accounts[_userAddress].closedPositionsKey.length > 0);
+        return
+            (accounts[_userAddress].positionsKeys.length > 0 || accounts[_userAddress].closedPositionsKeys.length > 0);
     }
 
     /**
@@ -199,39 +200,99 @@ contract DcaHodlup is Ownable {
      */
     function _executeIndividualDCA() internal {
         for (uint256 i = 0; i < userAddresses.length; i++) {
-            Position[] memory positionsKeys = accounts[userAddresses[i]].positionsKeys;
-            for (uint256 j = 0; j < positions.length; j++) {
+            uint256 posKeysLength = accounts[userAddresses[i]].positionsKeys.length;
+            for (uint256 j = 0; j < posKeysLength; j++) {
+                string memory positionName = accounts[userAddresses[i]].positionsKeys[j];
+                Position memory position = accounts[userAddresses[i]].positions[positionName];
                 if (
-                    positions[j].status == Status.Active && positions[j].stacking == false
-                        && block.timestamp > (positions[j].lastPurchaseTimestamp + positions[j].interval)
+                    position.status == Status.Active
+                        && block.timestamp > (position.lastPurchaseTimestamp + position.interval)
                 ) {
-                    if (positions[j].amountPerSwap > (positions[j].totalAmountToSwap - positions[j].SwappedFromBalance))
-                    {
-                        accounts[userAddresses[i]].positions[j].status = Status.Pause;
-                        emit PositionStatusChanged(userAddresses[i], j, Status.Pause, block.timestamp);
-                    } else {
-                        accounts[userAddresses[i]].positions[j].status = Status.Locked;
-                        SafeERC20.safeTransferFrom(
-                            positions[j].pair.token_from, userAddresses[i], address(this), positions[j].amountPerSwap
+                    if (position.amountPerSwap > (position.totalAmountToSwap - position.SwappedFromBalance)) {
+                        accounts[userAddresses[i]].positions[positionName].status = Status.Pause;
+                        emit PositionStatusChanged(
+                            userAddresses[i],
+                            address(inputToken),
+                            address(outputToken),
+                            positionName,
+                            Status.Pause,
+                            block.timestamp
                         );
-                        uint256 swapFees = (positions[j].amountPerSwap * swapFee / 10000);
-                        uint256 amoutPerSwapAfterFees = positions[j].amountPerSwap - (swapFees);
-                        uint256 resultSwap = _swap(positions[j].pair, amoutPerSwapAfterFees, positions[j].recipient);
-                        feesBalances[positions[j].pair.token_from] += swapFees;
-                        if (positions[j].mode == DcaMode.Limited) {
-                            accounts[userAddresses[i]].positions[j].dcaIterations -= 1;
+                    } else {
+                        accounts[userAddresses[i]].positions[positionName].status = Status.Locked;
+                        SafeERC20.safeTransferFrom(inputToken, userAddresses[i], address(this), position.amountPerSwap);
+                        uint256 swapFees = (position.amountPerSwap * swapFee / 10000);
+                        uint256 amoutPerSwapAfterFees = position.amountPerSwap - (swapFees);
+                        uint256 resultSwap = _swap(amoutPerSwapAfterFees, position.recipient);
+                        feesBalances[inputToken] += swapFees;
+                        if (position.mode == DcaMode.Limited) {
+                            accounts[userAddresses[i]].positions[positionName].dcaIterations -= 1;
                         }
-                        accounts[userAddresses[i]].positions[j].SwappedToBalance += resultSwap;
-                        accounts[userAddresses[i]].positions[j].SwappedFromBalance += positions[j].amountPerSwap;
-                        accounts[userAddresses[i]].positions[j].status = Status.Active;
-                        accounts[userAddresses[i]].positions[j].lastPurchaseTimestamp = block.timestamp;
+                        accounts[userAddresses[i]].positions[positionName].SwappedToBalance += resultSwap;
+                        accounts[userAddresses[i]].positions[positionName].SwappedFromBalance += position.amountPerSwap;
+                        accounts[userAddresses[i]].positions[positionName].status = Status.Active;
+                        accounts[userAddresses[i]].positions[positionName].lastPurchaseTimestamp = block.timestamp;
                         emit DCAExecuted(
                             userAddresses[i],
-                            j,
-                            address(positions[j].pair.token_from),
-                            address(positions[j].pair.token_to),
-                            positions[j].amountPerSwap,
+                            positionName,
+                            address(inputToken),
+                            address(outputToken),
+                            position.amountPerSwap,
                             resultSwap,
+                            block.timestamp
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    function _executeStakedDCA() internal {
+        uint256 totalToSwap = _getTotalToSwap();
+        uint256 swapFees = (totalToSwap * swapFee / 10000);
+        uint256 totalToSwapAfterFees = totalToSwap - swapFees;
+        uint256 totalSwapped = _swap(totalToSwapAfterFees, address(this));
+        feesBalances[inputToken] += swapFees;
+        uint256 userAddLength = userAddresses.length;
+        for (uint256 i = 0; i < userAddLength; i++) {
+            uint256 posKeysLength = accounts[userAddresses[i]].positionsKeys.length;
+            for (uint256 j = 0; j < posKeysLength; j++) {
+                string memory positionName = accounts[userAddresses[i]].positionsKeys[j];
+                Position memory position = accounts[userAddresses[i]].positions[positionName];
+                if (
+                    position.status == Status.Locked
+                        && block.timestamp > position.lastPurchaseTimestamp + position.interval
+                ) {
+                    if (position.amountPerSwap > (position.totalAmountToSwap - position.SwappedFromBalance)) {
+                        accounts[userAddresses[i]].positions[positionName].status = Status.Pause;
+                        emit PositionStatusChanged(
+                            userAddresses[i],
+                            address(inputToken),
+                            address(outputToken),
+                            positionName,
+                            Status.Pause,
+                            block.timestamp
+                        );
+                    } else {
+                        uint256 amountSwapped =
+                            (((position.amountPerSwap * 10000) / totalToSwap) * totalSwapped) / 10000;
+                        if (position.mode == DcaMode.Limited) {
+                            accounts[userAddresses[i]].positions[positionName].dcaIterations =
+                                position.dcaIterations - 1;
+                        }
+                        accounts[userAddresses[i]].positions[positionName].SwappedFromBalance =
+                            position.SwappedFromBalance + position.amountPerSwap;
+                        accounts[userAddresses[i]].positions[positionName].SwappedToBalance =
+                            position.SwappedToBalance + amountSwapped;
+                        accounts[userAddresses[i]].positions[positionName].status = Status.Active;
+                        accounts[userAddresses[i]].positions[positionName].lastPurchaseTimestamp = block.timestamp;
+                        emit DCAExecuted(
+                            userAddresses[i],
+                            positionName,
+                            address(inputToken),
+                            address(outputToken),
+                            position.amountPerSwap,
+                            amountSwapped,
                             block.timestamp
                         );
                     }
@@ -242,34 +303,36 @@ contract DcaHodlup is Ownable {
 
     /**
      * @dev Calculates the total amount of tokens to swap for a given token pair.
-     * @param _pair The token pair to swap.
      * @return The total amount of tokens to swap.
      */
     function _getTotalToSwap() internal returns (uint256) {
         uint256 totalToSwap;
-        for (uint256 i = 0; i < userAddresses.length; i++) {
-            Position[] memory positions = accounts[userAddresses[i]].positions;
-            for (uint256 j = 0; j < positions.length; j++) {
+        uint256 usersLength = userAddresses.length;
+        for (uint256 i = 0; i < usersLength; i++) {
+            uint256 positionsLength = accounts[userAddresses[i]].positionsKeys.length;
+            for (uint256 j = 0; j < positionsLength; j++) {
+                string memory positionName = accounts[userAddresses[i]].positionsKeys[j];
+                Position memory position = accounts[userAddresses[i]].positions[positionName];
                 if (
-                    positions[j].status == Status.Active 
-                        && block.timestamp > positions[j].lastPurchaseTimestamp + positions[j].interval
+                    position.status == Status.Active
+                        && block.timestamp > position.lastPurchaseTimestamp + position.interval
                 ) {
-                    totalToSwap += positions[j].amountPerSwap;
-                    accounts[userAddresses[i]].positions[j].status = Status.Locked;
+                    totalToSwap += position.amountPerSwap;
+                    accounts[userAddresses[i]].positions[positionName].status = Status.Locked;
                 }
             }
         }
         return totalToSwap;
     }
 
-    function _swap(Pair memory _pair, uint256 _amount, address _receiver) internal returns (uint256) {
-        require(_pair.token_from.balanceOf(address(this)) > _amount, "Insufficient balance of origin Token");
+    function _swap(uint256 _amount, address _receiver) internal returns (uint256) {
+        require(inputToken.balanceOf(address(this)) > _amount, "Insufficient balance of origin Token");
 
-        _pair.token_from.approve(address(swapRouter), _amount);
+        inputToken.approve(address(swapRouter), _amount);
 
         ISwapRouter.ExactInputSingleParams memory params = ISwapRouter.ExactInputSingleParams({
-            tokenIn: address(_pair.token_from),
-            tokenOut: address(_pair.token_to),
+            tokenIn: address(inputToken),
+            tokenOut: address(outputToken),
             fee: 3000,
             recipient: _receiver,
             deadline: block.timestamp + 1800,
@@ -279,27 +342,30 @@ contract DcaHodlup is Ownable {
         });
 
         if (_amount != 0) {
-            uint256 amountOut = swapRouter.exactInputSingle(params);
+           return swapRouter.exactInputSingle(params);
         } else {
             return 0;
         }
     }
 
-    function _closePosition(address _user, string _name) internal {
+    // don't forget to add a removing for approve ( for example mister T approved 1000 USD but stop position after 800 USD. We need to remove 200 USD of allowance)
+    function _closePosition(address _user, string calldata _name) internal {
         accounts[_user].positions[_name].status = Status.Closed;
-        _achivePosition(_user, _name);
-        closedPositionsKeys.push(_name);
+        accounts[_user].closedPositionsKeys.push(_name);
         accounts[_user].closedPositions[_name] = accounts[_user].positions[_name];
         delete(accounts[_user].positions[_name]);
-        for (uint256 i = 0; i < positionsKeys.length; i++) {
-            string memory _key = positionsKeys[i];
+        uint256 posKeysLength = accounts[_user].positionsKeys.length;
+        for (uint256 i = 0; i < posKeysLength; i++) {
+            string memory _key = accounts[_user].positionsKeys[i];
             if (keccak256(abi.encodePacked(_name)) == keccak256(abi.encodePacked(_key))) {
-                positionsKeys[i] = positionsKeys[positionsKeys.length - 1];
-                positionsKeys.pop();
+                accounts[_user].positionsKeys[i] = accounts[_user].positionsKeys[posKeysLength - 1];
+                accounts[_user].positionsKeys.pop();
                 break;
             }
         }
-        emit PositionStatusChanged(_user, inputToken, outputToken, _name, Status.Closed, block.timestamp);
+        emit PositionStatusChanged(
+            _user, address(inputToken), address(outputToken), _name, Status.Closed, block.timestamp
+        );
     }
 
     /**
@@ -324,8 +390,8 @@ contract DcaHodlup is Ownable {
         uint256 _dcaIterations
     ) external {
         require(bytes(_name).length > 0, "name must be set");
-        require(accounts[msg.sender].positions[_positionName].createdTimestamp == 0, "Position is already existing");
-        require(_interval >= 86400, "this interval is not allowed");
+        require(accounts[msg.sender].positions[_name].createdTimestamp == 0, "Position is already existing");
+        require(_interval >= 3, "this interval is not allowed"); // in production mode 86400
         require(_totalAmountToSwap > 0, "No amount set for DCA");
         require(
             (_amountPerSwap == 0 && _dcaIterations != 0) || (_amountPerSwap != 0 && _dcaIterations == 0),
@@ -336,7 +402,7 @@ contract DcaHodlup is Ownable {
         uint256 amountPerSwap =
             _amountPerSwap > 0 ? _amountPerSwap : ((_totalAmountToSwap * 10000) / _dcaIterations) / 10000;
 
-        SafeERC20.safeTransferFrom(inputToken, msg.sender, address(this), _totalAmountToSwap);
+        //SafeERC20.safeTransferFrom(inputToken, msg.sender, address(this), _totalAmountToSwap);
         // uint256 allowanceAmount = _pair.token_from.allowance(address(_pair.token_from), msg.sender);
         // if ( allowanceAmount == 0) {
         //     SafeERC20.safeApprove(_pair.token_from, msg.sender, _totalAmountToSwap);
@@ -362,9 +428,9 @@ contract DcaHodlup is Ownable {
             _dcaIterations == 0 ? DcaMode.Unlimited : DcaMode.Limited
         );
 
-        positionsKeys.push(_name);
+        accounts[msg.sender].positionsKeys.push(_name);
 
-        emit PositionCreated(msg.sender, inputToken, outputToken, _name, block.timestamp);
+        emit PositionCreated(msg.sender, address(inputToken), address(outputToken), _name, block.timestamp);
     }
 
     /**
@@ -375,9 +441,11 @@ contract DcaHodlup is Ownable {
      * Requirements:
      * - The position must exist.
      */
-    function setPositionStatus(string _name, Status _status) external positionExists(_name) {
+    function setPositionStatus(string calldata _name, Status _status) external positionExists(_name) {
         accounts[msg.sender].positions[_name].status = _status;
-        emit PositionStatusChanged(msg.sender, inputToken, outputToken, _name, _status, block.timestamp);
+        emit PositionStatusChanged(
+            msg.sender, address(inputToken), address(outputToken), _name, Status.Pause, block.timestamp
+        );
     }
 
     /**
@@ -387,7 +455,7 @@ contract DcaHodlup is Ownable {
      * - The position must exist.
      * - The position must not be locked.
      */
-    function closePosition(string _name) external positionExists(_name) {
+    function closePosition(string calldata _name) external positionExists(_name) {
         _closePosition(msg.sender, _name);
     }
 
@@ -397,12 +465,9 @@ contract DcaHodlup is Ownable {
      * - The caller must be the contract owner.
      */
     function claimFees() external onlyOwner {
-        IERC20[] memory tokens = _getAllInputToken();
-        for (uint256 i = 0; i < tokens.length; i++) {
-            uint256 balance = tokens[i].balanceOf(address(this));
-            if (balance > 0) {
-                SafeERC20.safeTransfer(tokens[i], msg.sender, feesBalances[tokens[i]]);
-            }
+        uint256 balance = inputToken.balanceOf(address(this));
+        if (balance > 0) {
+            SafeERC20.safeTransfer(inputToken, msg.sender, feesBalances[inputToken]);
         }
     }
 
@@ -411,8 +476,8 @@ contract DcaHodlup is Ownable {
      * @param _name The name of the position to get.
      * @return The position object.
      */
-    function getPosition(string calldata _name) external view returns (Position calldata) {
-        return accounts[msg.sender].positions[_positionId];
+    function getPosition(string calldata _name) external view returns (Position memory) {
+        return accounts[msg.sender].positions[_name];
     }
 
     /**

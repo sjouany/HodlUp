@@ -225,7 +225,7 @@ const ERC20TransferABI = [
     }
 ]
 
-const contractABIQ = require("../../../client/src/contracts/HodlUpHub.json")
+const contractABIQ = require("../../../client/src/contracts/DcaHodlup.json")
 const USDC_ADDRESS = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"
 const SAND_ADDRESS = "0xBbba073C31bF03b8ACf7c28EF0738DeCF3695683"
 const usdcToken = new web3.eth.Contract(ERC20TransferABI, USDC_ADDRESS)
