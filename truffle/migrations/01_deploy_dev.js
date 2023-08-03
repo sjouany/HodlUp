@@ -6,12 +6,16 @@ const UNISWAP_ROUTER_ADDRESS = "0xE592427A0AEce92De3Edee1F18E0157C05861564";
 const DEPOSIT_FEE = 50;
 const SWAP_FEE = 20;
 const DcaHodlup = artifacts.require("DcaHodlup");
+const HodlupManager = artifacts.require("HodlupManager");
 
 
 module.exports = async (deployer, network, accounts) => {
-    await deployer.deploy(DcaHodlup, USDC_ADDRESS, SAND_ADDRESS, UNISWAP_ROUTER_ADDRESS, SWAP_FEE, { from: accounts[0] });
+    //await deployer.deploy(DcaHodlup, USDC_ADDRESS, SAND_ADDRESS, UNISWAP_ROUTER_ADDRESS, SWAP_FEE, { from: accounts[0] });
+//    let dcaHodlup = await DcaHodlup.deployed();
+    await deployer.deploy(HodlupManager, { from: accounts[0] });
+    let hodlupManager = await HodlupManager.deployed();
 
-    let dcaHodlup = await DcaHodlup.deployed();
+
     // Chainlink Price feeds addresses POLYGON MAINNET
     // SAND / USD => 0x3D49406EDd4D52Fb7FFd25485f32E073b529C924
     // MATIC / USD => 0xAB594600376Ec9fD91F8e885dADF0CE036862dE0

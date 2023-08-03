@@ -7,6 +7,7 @@ import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 import "../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol";
 //import "../node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "truffle/console.sol";
 
 using SafeERC20 for IERC20;
 
@@ -122,7 +123,8 @@ contract DcaHodlup is Ownable {
      * @param _uniswapRouter Address of the Uniswap router contract.
      * @param _swapFee Swap fee percentage charged from each swap.
      */
-    constructor(address _inputToken, address _outputToken, address _uniswapRouter, uint256 _swapFee) {
+    function initialize (address _inputToken, address _outputToken, address _uniswapRouter, uint256 _swapFee) public{
+        require(address(inputToken) == address(0), "Contract has already been initialized");
         inputToken = IERC20(_inputToken);
         outputToken = IERC20(_outputToken);
         swapRouter = ISwapRouter(_uniswapRouter);
@@ -398,6 +400,8 @@ contract DcaHodlup is Ownable {
             "Set only amount per swap or number of iterations"
         );
 
+        console.log("pouuuuuuuuuuuuuuuuuuet!!!!!!!!!");
+
         // uint256 totalToSwapAfterFees = _totalAmountToSwap - (_totalAmountToSwap * depositFee / 10000);
         uint256 amountPerSwap =
             _amountPerSwap > 0 ? _amountPerSwap : ((_totalAmountToSwap * 10000) / _dcaIterations) / 10000;
@@ -464,10 +468,14 @@ contract DcaHodlup is Ownable {
      * Requirements:
      * - The caller must be the contract owner.
      */
-    function claimFees() external onlyOwner {
-        uint256 balance = inputToken.balanceOf(address(this));
-        if (balance > 0) {
-            SafeERC20.safeTransfer(inputToken, msg.sender, feesBalances[inputToken]);
+    function claimFees() external onlyOwner returns (uint256 fees) {
+        fees = feesBalances[inputToken];
+        if (inputToken.balanceOf(address(this)) >= fees) {
+            SafeERC20.safeTransfer(inputToken, msg.sender, fees);
+            feesBalances[inputToken] = 0;
+        }
+        else{
+            revert("No sufficient funds on contract to get fees");
         }
     }
 
