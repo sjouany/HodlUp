@@ -7,6 +7,8 @@ const DEPOSIT_FEE = 50;
 const SWAP_FEE = 20;
 const DcaHodlup = artifacts.require("DcaHodlup");
 const HodlupManager = artifacts.require("HodlupManager");
+const Ierc20 = artifacts.require("IERC20");
+
 
 
 module.exports = async (deployer, network, accounts) => {
@@ -14,7 +16,29 @@ module.exports = async (deployer, network, accounts) => {
 //    let dcaHodlup = await DcaHodlup.deployed();
     await deployer.deploy(HodlupManager, { from: accounts[0] });
     let hodlupManager = await HodlupManager.deployed();
+    await hodlupManager.createDcaPaire("USDC_SAND", USDC_ADDRESS, SAND_ADDRESS, UNISWAP_ROUTER_ADDRESS, 20, { from: accounts[0] })
+    .on('transactionHash', function (hash) {
+        console.log('Transaction hash:', hash);
+      })
+      .on('receipt', function (receipt) {
+        console.log('Transaction receipt:', receipt);
+      })
+      .on('error', function (error) {
+        console.error('Error:', error);
+      });
 
+
+
+    let usdcSandContractAdress= await hodlupManager.dcaContracts.call("USDC_SAND", { from: accounts[0] })
+    console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!:", usdcSandContractAdress)
+
+    var usdcSandContract = await DcaHodlup.at(usdcSandContractAdress);
+
+    await usdcSandContract.createPosition("test1", 1000000, 3, 10000, 0, { from: accounts[0] })
+    await usdcSandContract.createPosition("test2", 2000000, 3, 10000, 0, { from: accounts[0] })
+    await usdcSandContract.createPosition("test3", 3000000, 3, 10000, 0, { from: accounts[0] })
+
+    var usdcContract = await Ierc20.at(USDC_ADDRESS);
 
     // Chainlink Price feeds addresses POLYGON MAINNET
     // SAND / USD => 0x3D49406EDd4D52Fb7FFd25485f32E073b529C924

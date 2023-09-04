@@ -4,6 +4,7 @@ pragma solidity ^0.8.18;
 
 import "./DcaHodlup.sol";
 import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
+import "../node_modules/@ganache/console.log/console.sol";
 
 contract HodlupManager is Ownable {
     mapping(string => address) public dcaContracts;
@@ -11,11 +12,13 @@ contract HodlupManager is Ownable {
 
     event DcaCreated(string _name, address _contractAddress, uint256 _timestamp);
 
-    function createDcaPaire(string memory _name, address _tokenFrom, address _tokenTo, address _uniswapRouter, uint256 _fee)
-        external
-        onlyOwner
-        returns (address dcaContract)
-    {
+    function createDcaPaire(
+        string memory _name,
+        address _tokenFrom,
+        address _tokenTo,
+        address _uniswapRouter,
+        uint256 _fee
+    ) external onlyOwner returns (address dcaContract) {
         bytes32 salt = keccak256(abi.encodePacked(_name));
         bytes memory bytecode = type(DcaHodlup).creationCode;
 
@@ -23,7 +26,7 @@ contract HodlupManager is Ownable {
             dcaContract := create2(0, add(bytecode, 0x20), mload(bytecode), salt)
             if iszero(extcodesize(dcaContract)) { revert(0, 0) }
         }
-
+        console.logAddress(dcaContract);
         DcaHodlup(dcaContract).initialize(_tokenFrom, _tokenTo, _uniswapRouter, _fee);
 
         dcaContracts[_name] = dcaContract;
@@ -47,7 +50,6 @@ contract HodlupManager is Ownable {
         DcaHodlup(dcaContracts[contractName]).executeSwap();
     }
 
-    
     function executeAllSwap() public onlyOwner {
         uint256 dcaContNamesLength = dcaContractsNames.length;
         for (uint256 j = 0; j < dcaContNamesLength; j++) {
@@ -55,7 +57,6 @@ contract HodlupManager is Ownable {
             executeSwap(name);
         }
     }
-
 
     /// implementer le swap pour un contrat
     // le swap compter les positions

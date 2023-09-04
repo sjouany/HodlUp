@@ -7,7 +7,7 @@ import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 import "../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol";
 //import "../node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "truffle/console.sol";
+//import "../node_modules/@ganache/console.log/console.sol";
 
 using SafeERC20 for IERC20;
 
@@ -123,7 +123,7 @@ contract DcaHodlup is Ownable {
      * @param _uniswapRouter Address of the Uniswap router contract.
      * @param _swapFee Swap fee percentage charged from each swap.
      */
-    function initialize (address _inputToken, address _outputToken, address _uniswapRouter, uint256 _swapFee) public{
+    function initialize(address _inputToken, address _outputToken, address _uniswapRouter, uint256 _swapFee) public {
         require(address(inputToken) == address(0), "Contract has already been initialized");
         inputToken = IERC20(_inputToken);
         outputToken = IERC20(_outputToken);
@@ -212,6 +212,7 @@ contract DcaHodlup is Ownable {
                 ) {
                     if (position.amountPerSwap > (position.totalAmountToSwap - position.SwappedFromBalance)) {
                         accounts[userAddresses[i]].positions[positionName].status = Status.Pause;
+
                         emit PositionStatusChanged(
                             userAddresses[i],
                             address(inputToken),
@@ -249,84 +250,6 @@ contract DcaHodlup is Ownable {
         }
     }
 
-    function _executeStakedDCA() internal {
-        uint256 totalToSwap = _getTotalToSwap();
-        uint256 swapFees = (totalToSwap * swapFee / 10000);
-        uint256 totalToSwapAfterFees = totalToSwap - swapFees;
-        uint256 totalSwapped = _swap(totalToSwapAfterFees, address(this));
-        feesBalances[inputToken] += swapFees;
-        uint256 userAddLength = userAddresses.length;
-        for (uint256 i = 0; i < userAddLength; i++) {
-            uint256 posKeysLength = accounts[userAddresses[i]].positionsKeys.length;
-            for (uint256 j = 0; j < posKeysLength; j++) {
-                string memory positionName = accounts[userAddresses[i]].positionsKeys[j];
-                Position memory position = accounts[userAddresses[i]].positions[positionName];
-                if (
-                    position.status == Status.Locked
-                        && block.timestamp > position.lastPurchaseTimestamp + position.interval
-                ) {
-                    if (position.amountPerSwap > (position.totalAmountToSwap - position.SwappedFromBalance)) {
-                        accounts[userAddresses[i]].positions[positionName].status = Status.Pause;
-                        emit PositionStatusChanged(
-                            userAddresses[i],
-                            address(inputToken),
-                            address(outputToken),
-                            positionName,
-                            Status.Pause,
-                            block.timestamp
-                        );
-                    } else {
-                        uint256 amountSwapped =
-                            (((position.amountPerSwap * 10000) / totalToSwap) * totalSwapped) / 10000;
-                        if (position.mode == DcaMode.Limited) {
-                            accounts[userAddresses[i]].positions[positionName].dcaIterations =
-                                position.dcaIterations - 1;
-                        }
-                        accounts[userAddresses[i]].positions[positionName].SwappedFromBalance =
-                            position.SwappedFromBalance + position.amountPerSwap;
-                        accounts[userAddresses[i]].positions[positionName].SwappedToBalance =
-                            position.SwappedToBalance + amountSwapped;
-                        accounts[userAddresses[i]].positions[positionName].status = Status.Active;
-                        accounts[userAddresses[i]].positions[positionName].lastPurchaseTimestamp = block.timestamp;
-                        emit DCAExecuted(
-                            userAddresses[i],
-                            positionName,
-                            address(inputToken),
-                            address(outputToken),
-                            position.amountPerSwap,
-                            amountSwapped,
-                            block.timestamp
-                        );
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * @dev Calculates the total amount of tokens to swap for a given token pair.
-     * @return The total amount of tokens to swap.
-     */
-    function _getTotalToSwap() internal returns (uint256) {
-        uint256 totalToSwap;
-        uint256 usersLength = userAddresses.length;
-        for (uint256 i = 0; i < usersLength; i++) {
-            uint256 positionsLength = accounts[userAddresses[i]].positionsKeys.length;
-            for (uint256 j = 0; j < positionsLength; j++) {
-                string memory positionName = accounts[userAddresses[i]].positionsKeys[j];
-                Position memory position = accounts[userAddresses[i]].positions[positionName];
-                if (
-                    position.status == Status.Active
-                        && block.timestamp > position.lastPurchaseTimestamp + position.interval
-                ) {
-                    totalToSwap += position.amountPerSwap;
-                    accounts[userAddresses[i]].positions[positionName].status = Status.Locked;
-                }
-            }
-        }
-        return totalToSwap;
-    }
-
     function _swap(uint256 _amount, address _receiver) internal returns (uint256) {
         require(inputToken.balanceOf(address(this)) > _amount, "Insufficient balance of origin Token");
 
@@ -344,7 +267,7 @@ contract DcaHodlup is Ownable {
         });
 
         if (_amount != 0) {
-           return swapRouter.exactInputSingle(params);
+            return swapRouter.exactInputSingle(params);
         } else {
             return 0;
         }
@@ -399,8 +322,6 @@ contract DcaHodlup is Ownable {
             (_amountPerSwap == 0 && _dcaIterations != 0) || (_amountPerSwap != 0 && _dcaIterations == 0),
             "Set only amount per swap or number of iterations"
         );
-
-        console.log("pouuuuuuuuuuuuuuuuuuet!!!!!!!!!");
 
         // uint256 totalToSwapAfterFees = _totalAmountToSwap - (_totalAmountToSwap * depositFee / 10000);
         uint256 amountPerSwap =
@@ -473,8 +394,7 @@ contract DcaHodlup is Ownable {
         if (inputToken.balanceOf(address(this)) >= fees) {
             SafeERC20.safeTransfer(inputToken, msg.sender, fees);
             feesBalances[inputToken] = 0;
-        }
-        else{
+        } else {
             revert("No sufficient funds on contract to get fees");
         }
     }
