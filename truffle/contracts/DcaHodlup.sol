@@ -12,16 +12,14 @@ import "../node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol"
 using SafeERC20 for IERC20;
 
 /**
- * @title HodlUpHub contract
- * @dev This contract is used for hodling tokens and executing automated periodic swaps.
+ * @title DcaHodlup
+ * @notice A contract for DCA investment strategy with swapping functionality.
+ * @dev This contract allows users to create DCA positions and execute periodic swaps using a Uniswap router.
+ * @dev Users can create, manage, and close DCA positions, and the owner can execute swaps and claim fees.
  */
 contract DcaHodlup is Ownable {
     /**
-     * @dev Enum representing the available statuses for a position.
-     * Active: the position is currently being executed
-     * Pause: the position is temporarily paused
-     * Closed: the position has been fully executed and cannot be reopened
-     * Locked: the position is locked for DCA, meaning that the tokens have been swapped but not transferred to the user
+     * @dev Enum representing the possible status of a DCA position.
      */
     enum Status {
         Active,
@@ -29,33 +27,19 @@ contract DcaHodlup is Ownable {
         Closed,
         Locked
     }
-
     /**
-     * @dev Enum representing the available DCA modes.
-     * Limited: the position has a fixed number of swaps.
-     * Unlimited: the position will continue to swap indefinitely.
+     * @dev Enum representing the DCA mode (Limited or Unlimited) for a position.
      */
     enum DcaMode {
         Limited,
         Unlimited
     }
 
-    /**
-     * @dev The available pairs for swapping.
-     */
     IERC20 inputToken;
     IERC20 outputToken;
 
-    /**
-     * @dev The Uniswap V3 router.
-     */
     ISwapRouter swapRouter;
 
-    /**
-     * @dev Struct representing a user's data.
-     * positions: An array of the user's open positions.
-     * closedPositions: An array of the user's closed positions.
-     */
     struct Account {
         mapping(string => Position) positions;
         string[] positionsKeys;
@@ -63,21 +47,6 @@ contract DcaHodlup is Ownable {
         string[] closedPositionsKeys;
     }
 
-    /**
-     * @dev Struct representing a user's position.
-     * name: The name of the position.
-     * totalAmountToSwap: The total amount of token_from to be swapped.
-     * interval: The time interval (in seconds) between swaps.
-     * dcaIterations: The number of swaps remaining for the position (in case of Limited DCA mode).
-     * amountPerSwap: The amount of token_from to be swapped per interval.
-     * lastPurchaseTimestamp: The timestamp of the last swap.
-     * createdTimestamp: The timestamp of the position creation.
-     * SwappedFromBalance: The total amount of token_from swapped so far.
-     * SwappedToBalance: The total amount of token_to received so far.
-     * status: The current status of the position.
-     * recipient: The address to receive the swapped tokens.
-     * mode: The DCA mode of the position.
-     */
     struct Position {
         string name;
         uint256 totalAmountToSwap;
@@ -93,35 +62,19 @@ contract DcaHodlup is Ownable {
         DcaMode mode;
     }
 
-    /**
-     * @dev Mapping that stores information about each user.
-     */
     mapping(address => Account) accounts;
-
-    /**
-     * @dev Array that stores the addresses of all registered accounts.
-     */
     address[] public userAddresses;
-
-    /**
-     * @dev Mapping that stores the balances of fees collected for each ERC20 token.
-     */
     mapping(IERC20 => uint256) feesBalances;
-
-    /**
-     * @dev Represents the fee percentage taken for swaps.
-     *      To avoid rounding errors, the percentage is multiplied by 10000.
-     *      For example, 1% is represented by 100.
-     */
     uint256 public swapFee;
-
     uint256 private currentUserindex;
     uint256 private operationsLimit;
 
     /**
-     * @dev HodlUpHub constructor.
-     * @param _uniswapRouter Address of the Uniswap router contract.
-     * @param _swapFee Swap fee percentage charged from each swap.
+     * @dev Initializes the contract with the specified parameters.
+     * @param _inputToken Address of the input token for swaps.
+     * @param _outputToken Address of the output token for swaps.
+     * @param _uniswapRouter Address of the Uniswap router.
+     * @param _swapFee The swap fee percentage.
      */
     function initialize(address _inputToken, address _outputToken, address _uniswapRouter, uint256 _swapFee) public {
         require(address(inputToken) == address(0), "Contract has already been initialized");
@@ -132,33 +85,37 @@ contract DcaHodlup is Ownable {
     }
 
     /**
-     * @dev Emitted when a new position is created.
-     * @param sender The address of the user who created the position.
-     * @param name The name of the position created.
-     * @param date The timestamp of when the event was emitted.
+     * @dev Event emitted when a new DCA position is created.
+     * @param sender The address of the sender.
+     * @param token_from The address of the input token.
+     * @param token_to The address of the output token.
+     * @param name The name of the DCA position.
+     * @param date The timestamp of the event.
      */
     event PositionCreated(address indexed sender, address token_from, address token_to, string name, uint256 date);
 
     /**
-     * @dev Emitted when the status of a position is changed.
-     * @param sender The address of the user who changed the position status.
-     * @param name The name of the position whose status was changed.
-     * @param status The new status of the position.
-     * @param date The timestamp of when the event was emitted.
+     * @dev Event emitted when the status of a DCA position is changed.
+     * @param sender The address of the sender.
+     * @param token_from The address of the input token.
+     * @param token_to The address of the output token.
+     * @param name The name of the DCA position.
+     * @param status The new status of the DCA position.
+     * @param date The timestamp of the event.
      */
     event PositionStatusChanged(
         address indexed sender, address token_from, address token_to, string name, Status status, uint256 date
     );
 
     /**
-     * @dev Emitted when a DCA is executed.
-     * @param user The address of the user who executed the DCA.
-     * @param name The name of the position associated with the DCA.
-     * @param token_from The address of the ERC20 token being swapped from.
-     * @param token_to The address of the ERC20 token being swapped to.
-     * @param amountToSwap The amount of token_from being swapped.
-     * @param amountSwapped The amount of token_to received in the swap.
-     * @param date The timestamp of when the event was emitted.
+     * @dev Event emitted when a DCA is executed.
+     * @param user The address of the user.
+     * @param name The name of the DCA position.
+     * @param token_from The address of the input token.
+     * @param token_to The address of the output token.
+     * @param amountToSwap The amount to swap.
+     * @param amountSwapped The amount swapped.
+     * @param date The timestamp of the event.
      */
     event DCAExecuted(
         address user,
@@ -170,19 +127,27 @@ contract DcaHodlup is Ownable {
         uint256 date
     );
 
+    /**
+     * @dev Modifier to check if a DCA position exists.
+     * @param _positionName The name of the DCA position.
+     */
     modifier positionExists(string memory _positionName) {
         _positionExists(_positionName);
         _;
     }
 
+    /**
+     * @dev Checks if a DCA position with a given name exists for the caller.
+     * @param _positionName The name of the DCA position to check.
+     */
     function _positionExists(string memory _positionName) internal view {
         require(accounts[msg.sender].positions[_positionName].createdTimestamp > 0, "Position doesn't exist");
     }
 
     /**
-     * @dev Returns a boolean indicating whether a user with the specified address exists in the `accounts` mapping.
+     * @dev Checks if a user account exists based on the presence of DCA positions.
      * @param _userAddress The address of the user to check.
-     * @return True if the user exists, false otherwise.
+     * @return True if the user account exists, false otherwise.
      */
     function _userExists(address _userAddress) internal view returns (bool) {
         return
@@ -190,29 +155,27 @@ contract DcaHodlup is Ownable {
     }
 
     /**
-     * @dev Executes the DCA strategy for all active positions of all accounts.
-     * Checks if the current time is greater than the last purchase timestamp
-     * plus the interval of the position. If so, executes a swap of the amountPerSwap
-     * for the token_from in the position's pair to the token_to in the pair,
-     * subtracts the swap fee from the amount and adds it to the feesBalances,
-     * and updates the balances and status of the position.
-     * If the amountPerSwap is greater than the remaining amount to swap,
-     * pauses the position and emits a PositionStatusChanged event.
-     * Emits a DCAExecuted event on successful execution of the swap.
+     * @dev Executes Dollar-Cost Averaging (DCA) swaps for all active positions of all users.
+     * @dev This function iterates through user accounts and their DCA positions, executing swaps as necessary.
+     * @dev It checks the status and timing of each position to determine if a swap should be executed.
      */
     function _executeIndividualDCA() internal {
         for (uint256 i = 0; i < userAddresses.length; i++) {
-            uint256 posKeysLength = accounts[userAddresses[i]].positionsKeys.length;
+            Account storage account = accounts[userAddresses[i]];
+            uint256 posKeysLength = account.positionsKeys.length;
+
             for (uint256 j = 0; j < posKeysLength; j++) {
-                string memory positionName = accounts[userAddresses[i]].positionsKeys[j];
-                Position memory position = accounts[userAddresses[i]].positions[positionName];
+                string memory positionName = account.positionsKeys[j];
+                Position storage position = account.positions[positionName];
+
                 if (
                     position.status == Status.Active
                         && block.timestamp > (position.lastPurchaseTimestamp + position.interval)
                 ) {
-                    if (position.amountPerSwap > (position.totalAmountToSwap - position.SwappedFromBalance)) {
-                        accounts[userAddresses[i]].positions[positionName].status = Status.Pause;
+                    uint256 remainingToSwap = position.totalAmountToSwap - position.SwappedFromBalance;
 
+                    if (position.amountPerSwap > remainingToSwap) {
+                        position.status = Status.Pause;
                         emit PositionStatusChanged(
                             userAddresses[i],
                             address(inputToken),
@@ -222,25 +185,31 @@ contract DcaHodlup is Ownable {
                             block.timestamp
                         );
                     } else {
-                        accounts[userAddresses[i]].positions[positionName].status = Status.Locked;
-                        SafeERC20.safeTransferFrom(inputToken, userAddresses[i], address(this), position.amountPerSwap);
-                        uint256 swapFees = (position.amountPerSwap * swapFee / 10000);
-                        uint256 amoutPerSwapAfterFees = position.amountPerSwap - (swapFees);
-                        uint256 resultSwap = _swap(amoutPerSwapAfterFees, position.recipient);
+                        position.status = Status.Locked;
+                        uint256 swapAmount = position.amountPerSwap;
+                        SafeERC20.safeTransferFrom(inputToken, userAddresses[i], address(this), swapAmount);
+
+                        uint256 swapFees = (swapAmount * swapFee) / 10000;
+                        uint256 amountPerSwapAfterFees = swapAmount - swapFees;
+                        uint256 resultSwap = _swap(amountPerSwapAfterFees, position.recipient);
+
                         feesBalances[inputToken] += swapFees;
+
                         if (position.mode == DcaMode.Limited) {
-                            accounts[userAddresses[i]].positions[positionName].dcaIterations -= 1;
+                            position.dcaIterations -= 1;
                         }
-                        accounts[userAddresses[i]].positions[positionName].SwappedToBalance += resultSwap;
-                        accounts[userAddresses[i]].positions[positionName].SwappedFromBalance += position.amountPerSwap;
-                        accounts[userAddresses[i]].positions[positionName].status = Status.Active;
-                        accounts[userAddresses[i]].positions[positionName].lastPurchaseTimestamp = block.timestamp;
+
+                        position.SwappedToBalance += resultSwap;
+                        position.SwappedFromBalance += swapAmount;
+                        position.status = Status.Active;
+                        position.lastPurchaseTimestamp = block.timestamp;
+
                         emit DCAExecuted(
                             userAddresses[i],
                             positionName,
                             address(inputToken),
                             address(outputToken),
-                            position.amountPerSwap,
+                            swapAmount,
                             resultSwap,
                             block.timestamp
                         );
@@ -250,6 +219,15 @@ contract DcaHodlup is Ownable {
         }
     }
 
+    /**
+     * @dev Executes a token swap operation using the Uniswap router.
+     * @param _amount The amount of the input token to swap.
+     * @param _receiver The address to receive the swapped tokens.
+     * @return The amount of output tokens received from the swap.
+     * @notice This function swaps a specified amount of the input token for output tokens
+     * using the Uniswap router. It checks the balance of the input token to ensure sufficient funds,
+     * approves the router to spend the input token, and sets the swap parameters.
+     */
     function _swap(uint256 _amount, address _receiver) internal returns (uint256) {
         require(inputToken.balanceOf(address(this)) > _amount, "Insufficient balance of origin Token");
 
@@ -273,8 +251,16 @@ contract DcaHodlup is Ownable {
         }
     }
 
-    // don't forget to add a removing for approve ( for example mister T approved 1000 USD but stop position after 800 USD. We need to remove 200 USD of allowance)
+    /**
+     * @dev Closes a Dollar-Cost Averaging (DCA) position for a user.
+     * @param _user The address of the user who owns the DCA position.
+     * @param _name The name of the DCA position to be closed.
+     * @notice This function closes a DCA position by updating its status to 'Closed', moving it
+     * to the 'closedPositions' mapping, and removing it from the 'positions' mapping for the specified user.
+     * Additionally, it updates the user's list of DCA position keys and emits an event to indicate the closure.
+     */
     function _closePosition(address _user, string calldata _name) internal {
+        // don't forget to add a removing for approve ( for example mister T approved 1000 USD but stop position after 800 USD. We need to remove 200 USD of allowance)
         accounts[_user].positions[_name].status = Status.Closed;
         accounts[_user].closedPositionsKeys.push(_name);
         accounts[_user].closedPositions[_name] = accounts[_user].positions[_name];
@@ -294,18 +280,12 @@ contract DcaHodlup is Ownable {
     }
 
     /**
-     * @dev Create a new position for the user.
-     * @param _name The name of the position.
-     * @param _totalAmountToSwap The total amount to swap for the position.
-     * @param _interval The interval for DCA swaps.
-     * @param _amountPerSwap The amount to swap per DCA iteration.
+     * @dev Creates a new DCA position.
+     * @param _name The name of the DCA position.
+     * @param _totalAmountToSwap The total amount to swap.
+     * @param _interval The swap interval.
+     * @param _amountPerSwap The amount to swap per interval.
      * @param _dcaIterations The number of DCA iterations.
-     * Requirements:
-     * - The name must be set.
-     * - The position does not already exist for the user.
-     * - The interval exists in intervalsAvailable.
-     * - The total amount to swap is greater than 0.
-     * - Either the amount per swap or the number of DCA iterations is set, but not both.
      */
     function createPosition(
         string calldata _name,
@@ -323,7 +303,6 @@ contract DcaHodlup is Ownable {
             "Set only amount per swap or number of iterations"
         );
 
-        // uint256 totalToSwapAfterFees = _totalAmountToSwap - (_totalAmountToSwap * depositFee / 10000);
         uint256 amountPerSwap =
             _amountPerSwap > 0 ? _amountPerSwap : ((_totalAmountToSwap * 10000) / _dcaIterations) / 10000;
 
@@ -359,12 +338,9 @@ contract DcaHodlup is Ownable {
     }
 
     /**
-     * @dev Set the status of a user's position.
-     * @param _name The name of the position to update.
-     * @param _status The new status of the position.
-     * Emits a {PositionStatusChanged} event.
-     * Requirements:
-     * - The position must exist.
+     * @dev Sets the status of a DCA position.
+     * @param _name The name of the DCA position.
+     * @param _status The new status of the DCA position.
      */
     function setPositionStatus(string calldata _name, Status _status) external positionExists(_name) {
         accounts[msg.sender].positions[_name].status = _status;
@@ -374,20 +350,16 @@ contract DcaHodlup is Ownable {
     }
 
     /**
-     * @dev Close a position and transfer any remaining tokens back to the user's wallet.
-     * @param _name The ID of the position to close.
-     * Requirements:
-     * - The position must exist.
-     * - The position must not be locked.
+     * @dev Closes a DCA position.
+     * @param _name The name of the DCA position.
      */
     function closePosition(string calldata _name) external positionExists(_name) {
         _closePosition(msg.sender, _name);
     }
 
     /**
-     * @dev Claim all fees collected by the contract.
-     * Requirements:
-     * - The caller must be the contract owner.
+     * @dev Claims accumulated fees.
+     * @return fees The fees claimed.
      */
     function claimFees() external onlyOwner returns (uint256 fees) {
         fees = feesBalances[inputToken];
@@ -400,18 +372,17 @@ contract DcaHodlup is Ownable {
     }
 
     /**
-     * @dev Get a position by name.
-     * @param _name The name of the position to get.
-     * @return The position object.
+     * @dev Retrieves the details of a DCA position for the caller.
+     * @param _name The name of the DCA position to retrieve.
+     * @return Position struct containing position details.
      */
     function getPosition(string calldata _name) external view returns (Position memory) {
         return accounts[msg.sender].positions[_name];
     }
 
     /**
-     * @dev Execute swaps for all individual and staked DCA positions.
-     * Requirements:
-     * - The caller must be the contract owner.
+     * @dev Executes swaps for all active DCA positions of all users.
+     * @dev Only the contract owner can execute this function.
      */
     function executeSwap() external onlyOwner {
         _executeIndividualDCA();
