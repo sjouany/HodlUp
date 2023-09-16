@@ -258,6 +258,14 @@ async function main() {
 
         // const txApproveUsdc = await usdcToken.methods.approve(contractDeployed, 1000000000000);
         // console.log("TX: ", txApproveUsdc)
+        const myUsdcBalance2 = await usdcToken.methods.balanceOf("0x0BD4A6F25d3545524E16f5e6869EB2EF34Ffb441").call()
+        console.log("F34Ffb441 USDC balance is: ", myUsdcBalance2)
+
+        const myUsdcBalance3 = await sandToken.methods.balanceOf("0x0BD4A6F25d3545524E16f5e6869EB2EF34Ffb441").call()
+        console.log("F34Ffb441 SAND balance is: ", myUsdcBalance3)
+
+        const tempcontractUsdcBalance = await usdcToken.methods.balanceOf("0xc779d3bCe4d3f9763101eba86318929ea5d62332").call()
+        console.log("TEMP CONTRACT USDC balance is: ", tempcontractUsdcBalance)
 
     } catch (err) {
         console.log("An error occurred", err)

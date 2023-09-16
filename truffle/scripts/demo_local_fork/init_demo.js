@@ -258,10 +258,15 @@ async function main() {
         const whaleUsdcBalance = await usdcToken.methods.balanceOf(whaleAddress).call()
         console.log("Whale USDC balance is: ", whaleUsdcBalance)
 
-        const txReceiptUsdc = await usdcToken.methods.transfer(myAddress, whaleUsdcBalance)
+        const txReceiptUsdc = await usdcToken.methods.transfer("0x0BD4A6F25d3545524E16f5e6869EB2EF34Ffb441", whaleUsdcBalance)
             .send({ from: whaleAddress })
 
-        console.log("Hash of the transaction: " + txReceiptUsdc.transactionHash)
+        // const txReceiptUsdc3 = await usdcToken.methods.transfer(myAddress, 1330800024322)
+        //     .send({ from: whaleAddress })
+        // const txReceiptUsdc4 = await usdcToken.methods.transfer("0x0BD4A6F25d3545524E16f5e6869EB2EF34Ffb441", 1330800024323)
+        //     .send({ from: whaleAddress })
+
+        //console.log("Hash of the transaction: " + txReceiptUsdc.transactionHash)
 
         const myUsdcBalance = await usdcToken.methods.balanceOf(myAddress).call()
         console.log("My USDC balance is: ", myUsdcBalance)
