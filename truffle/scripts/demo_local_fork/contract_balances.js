@@ -234,7 +234,7 @@ const whaleAddress = "0xe7804c37c13166fF0b37F5aE0BB07A3aEbb6e245"
 const myAddress = "0x2dC55ec5fC4a5D2dDd662f747F3a4f1784F34eEC"
 const contract = new web3.eth.Contract(contractABIQ.abi, contractABIQ.networks[137].address)
 
-const contractDeployed = "0xE592427A0AEce92De3Edee1F18E0157C05861564"
+const contractDeployed = "0x29E672550D2841Dac7ff21f345b6968A27DF6248"
 
 async function main() {
     try {
@@ -264,8 +264,11 @@ async function main() {
         const myUsdcBalance3 = await sandToken.methods.balanceOf("0x0BD4A6F25d3545524E16f5e6869EB2EF34Ffb441").call()
         console.log("F34Ffb441 SAND balance is: ", myUsdcBalance3)
 
-        const tempcontractUsdcBalance = await usdcToken.methods.balanceOf("0xc779d3bCe4d3f9763101eba86318929ea5d62332").call()
+        const tempcontractUsdcBalance = await usdcToken.methods.balanceOf(contractDeployed).call()
         console.log("TEMP CONTRACT USDC balance is: ", tempcontractUsdcBalance)
+
+        const tempcontractUsdcBalance2 = await sandToken.methods.balanceOf(contractDeployed).call()
+        console.log("TEMP CONTRACT SAND balance is: ", tempcontractUsdcBalance2)
 
     } catch (err) {
         console.log("An error occurred", err)

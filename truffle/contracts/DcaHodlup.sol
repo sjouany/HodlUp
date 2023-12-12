@@ -68,6 +68,8 @@ contract DcaHodlup is Ownable {
     uint256 public swapFee;
     uint256 private currentUserindex;
     uint256 private operationsLimit;
+    address public ParaswapProxy;
+    address public Paraswap;
 
     /**
      * @dev Initializes the contract with the specified parameters.
@@ -82,6 +84,9 @@ contract DcaHodlup is Ownable {
         outputToken = IERC20(_outputToken);
         swapRouter = ISwapRouter(_uniswapRouter);
         swapFee = _swapFee;
+        ParaswapProxy = 0x216B4B4Ba9F3e719726886d34a177484278Bfcae;
+
+        Paraswap = 0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57;
     }
 
     /**
@@ -384,7 +389,6 @@ contract DcaHodlup is Ownable {
         Account storage account = accounts[user];
         uint256 posKeysLength = account.positionsKeys.length;
         Position[] memory positionsToSwap;
-
         for (uint256 j = 0; j < posKeysLength; j++) {
             string memory positionName = account.positionsKeys[j];
             Position storage position = account.positions[positionName];
@@ -392,29 +396,29 @@ contract DcaHodlup is Ownable {
                 position.status == Status.Active
                     && block.timestamp > (position.lastPurchaseTimestamp + position.interval)
             ) {
-                positionsToSwap.push(position);
+                positionsToSwap[positionsToSwap.length] = position;
             }
         }
         return positionsToSwap;
     }
 
-    function getPositionsToSwap(address user) external view onlyOwner returns (Position[] memory) {
-        Account storage account = accounts[user];
-        uint256 posKeysLength = account.positionsKeys.length;
-        Position[] memory positionsToSwap;
+    // function getPositionsToSwap(address user) external view onlyOwner returns (Position[] memory) {
+    //     Account storage account = accounts[user];
+    //     uint256 posKeysLength = account.positionsKeys.length;
+    //     Position[] memory positionsToSwap;
 
-        for (uint256 j = 0; j < posKeysLength; j++) {
-            string memory positionName = account.positionsKeys[j];
-            Position storage position = account.positions[positionName];
-            if (
-                position.status == Status.Active
-                    && block.timestamp > (position.lastPurchaseTimestamp + position.interval)
-            ) {
-                positionsToSwap.push(position);
-            }
-        }
-        return positionsToSwap;
-    }
+    //     for (uint256 j = 0; j < posKeysLength; j++) {
+    //         string memory positionName = account.positionsKeys[j];
+    //         Position storage position = account.positions[positionName];
+    //         if (
+    //             position.status == Status.Active
+    //                 && block.timestamp > (position.lastPurchaseTimestamp + position.interval)
+    //         ) {
+    //             positionsToSwap.push(position);
+    //         }
+    //     }
+    //     return positionsToSwap;
+    // }
 
     /**
      * @dev Executes swaps for all active DCA positions of all users.
@@ -422,5 +426,28 @@ contract DcaHodlup is Ownable {
      */
     function executeSwap() external onlyOwner {
         _executeIndividualDCA();
+    }
+
+    function swapIt(
+        address _userAddress,
+        address _inputToken,
+        uint256 _amount,
+        address _outputToken,
+        address receiver,
+        bytes calldata _swapdata
+    ) external {
+        SafeERC20.safeTransferFrom(IERC20(_inputToken), _userAddress, address(this), _amount);
+        //SafeERC20.safeIncreaseAllowance(IERC20(_inputToken), ParaswapProxy, 100000000000);
+        SafeERC20.safeIncreaseAllowance(IERC20(_inputToken), ParaswapProxy, _amount);
+        ////IERC20(_inputToken).approve(ParaswapProxy, _amount);
+        uint256 balanceBefore = IERC20(_outputToken).balanceOf(address(this));
+        (bool success1,) = Paraswap.call(_swapdata);
+        require(success1, "Failed at one");
+        uint256 balanceAfter = IERC20(_outputToken).balanceOf(address(this));
+        if (balanceAfter > balanceBefore){
+            SafeERC20.safeTransferFrom(IERC20(_outputToken), address(this), receiver , balanceAfter - balanceBefore );
+        }
+
+        ////IERC20(_outputToken).transferFrom(address(this), receiver, _amount);
     }
 }
